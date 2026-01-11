@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "4301213054",
+    "project_id": "ks-constructions",
+    "storage_bucket": "ks-constructions.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4301213054:android:11738443525b206885b72f",
+        "android_client_info": {
+          "package_name": "com.ksconstructions.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA709o-U3acZFOBP2Mw46nVpjLYU6X8ASw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,1 @@
+export { ManageVendorPage } from './ManageVendor';
