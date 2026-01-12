@@ -42,7 +42,7 @@ export const ManageSite = () => {
       <div className="p-4 max-w-full flex flex-col gap-10">
         <SiteCard setSiteUpdateDialog={setSiteUpdateDialog} site={site} />
         <div>
-          <div className="text-xl font-semibold mb-5">Actions</div>
+          <div className="text-xl font-semibold mb-5">NMR</div>
           <div className="grid space-y-4">
             <ItemCard
               title="Mark Attendance"

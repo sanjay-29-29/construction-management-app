@@ -82,7 +82,7 @@ export function LoginPage() {
   };
 
   if (isAuth) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
   return (
@@ -107,7 +107,6 @@ export function LoginPage() {
                 <FormItem>
                   <FormLabel>E-mail</FormLabel>
                   <FormControl>
-                    {/* Increased height (h-12) for better touch targets */}
                     <Input
                       placeholder="Enter your email"
                       type="email"
@@ -121,7 +120,6 @@ export function LoginPage() {
                 </FormItem>
               )}
             />
-
             {/* Password Field */}
             <FormField
               control={form.control}
@@ -139,6 +137,7 @@ export function LoginPage() {
                       disabled={mutation.isPending}
                       endContent={
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.preventDefault();
                             setShowPassword((val) => !val);
@@ -159,7 +158,6 @@ export function LoginPage() {
               )}
             />
             <Button
-              type="submit"
               className="w-full h-12 text-base font-medium"
               disabled={mutation.isPending}
             >

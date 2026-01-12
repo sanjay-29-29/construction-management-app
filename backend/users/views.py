@@ -40,9 +40,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class SupervisorDropdown(ListAPIView):
-    queryset = get_user_model().objects.filter(
-        role=Roles.SITE_ENGINEER, is_active=True
-    )
+    queryset = get_user_model().objects.filter(role=Roles.SITE_ENGINEER, is_active=True)
     serializer_class = UserDropdownSerializer
 
 

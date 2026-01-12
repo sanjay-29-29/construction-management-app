@@ -20,7 +20,7 @@ export const HomePage = () => {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const navigate = useNavigate();
 
-  const logout = async () => {
+  const logout = () => {
     clearAuth();
     toast.success('Logged out successfully.');
     navigate('/login', { replace: true });
@@ -51,7 +51,7 @@ export const HomePage = () => {
             </div>
           }
         />
-        {user?.role === ROLES.HEAD_OFFICE && (
+        {(user?.role === ROLES.HEAD_OFFICE || user?.role === ROLES.ADMIN) && (
           <>
             <ItemCard
               title="Vendors"

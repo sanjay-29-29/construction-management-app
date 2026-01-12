@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { isAxiosError } from 'axios';
-import { Edit, EllipsisVerticalIcon, X } from 'lucide-react';
+import { Edit, EllipsisVerticalIcon, PrinterIcon, X } from 'lucide-react';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 
 import { client } from '@/axios';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,17 +62,21 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
     return data?.labours?.map((labour) => {
       const row: AttendanceGridRow = { ...labour };
       let weeklyTotal = 0;
+      let toPayAtWeekend = labour.openingBalance ?? 0;
 
       data?.dailyEntry?.forEach((entry) => {
         const record = entry.attendance.find((a) => a.labour === labour.id);
         row[entry.date] = record || null;
+
         if (record?.isPresent) {
-          // Logic: Wage earned minus Advance taken = Net Pay for the week
-          weeklyTotal += record.wageForDay || 0;
-          weeklyTotal += record.advanceTaken || 0;
+          weeklyTotal += record.wageForDay + record.advanceTaken;
+          toPayAtWeekend +=
+            (labour.weeklyDailyWage ?? 0) -
+            (record.wageForDay + record.advanceTaken);
         }
       });
 
+      row.toPayAtWeekend = toPayAtWeekend;
       row.weeklyTotal = weeklyTotal;
       return row;
     });
@@ -128,7 +133,8 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
             isEditable: boolean;
             id: string;
           }) => {
-            const isHeadOffice = user?.role === ROLES.HEAD_OFFICE;
+            const isHeadOffice =
+              user?.role === ROLES.HEAD_OFFICE || user?.role === ROLES.ADMIN;
             const showDropdown = isHeadOffice || isEditable;
             if (!showDropdown) {
               return (
@@ -279,9 +285,25 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
           },
         };
       }),
+
+      {
+        field: 'toPayAtWeekend',
+        headerName: 'To Pay',
+        width: 120,
+        cellRenderer: (params: ICellRendererParams) => {
+          if (params.node.isRowPinned()) return null;
+          const val = params.value || 0;
+          return (
+            <span className="w-full text-center font-semibold">
+              ₹ {formatNumber(val)}
+            </span>
+          );
+        },
+      },
+
       {
         field: 'weeklyTotal',
-        headerName: 'Weekly Total',
+        headerName: 'Amount Paid',
         width: 120,
         cellClass:
           'bg-emerald-50 font-semibold flex items-center justify-center border-emerald-200',
@@ -307,16 +329,22 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
 
   return (
     <div className="h-full space-y-4">
-      <div className="text-xl font-semibold text-gray-900">
-        This Week's Attendance
+      <div className="flex justify-between items-center">
+        <div className="text-xl font-semibold text-gray-900">
+          This Week's Attendance
+        </div>
+        <Button variant="outline">
+          <PrinterIcon />
+        </Button>
       </div>
-      <div className="h-120 sm:h-200 overflow-auto create-order">
+      <div className="h-120 sm:h-200 overflow-auto create-order ag-theme-alpine">
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
           pinnedBottomRowData={footerData}
           suppressMovableColumns
           suppressRowHoverHighlight
+          suppressCellFocus
           headerHeight={56}
           defaultColDef={{
             resizable: true,

@@ -29,6 +29,7 @@ class LabourCreateUpdateSerializer(serializers.ModelSerializer):
             "type",
             "gender",
             "previous_balance",
+            "photo",
         ]
 
 
@@ -43,6 +44,7 @@ class LabourSerializer(serializers.ModelSerializer):
             "name",
             "type",
             "gender",
+            "photo",
         ]
 
 

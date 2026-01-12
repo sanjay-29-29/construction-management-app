@@ -200,16 +200,18 @@ export const ManageUserPage = () => {
                   </div>
                 </CardDescription>
               </div>
-              {user?.role === ROLES.HEAD_OFFICE && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9 shrink-0 border-gray-300 hover:bg-gray-100"
-                  onClick={() => setUserUpdateDialog(true)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              )}
+              {(user?.role === ROLES.SITE_ENGINEER &&
+                currentUser?.role == ROLES.HEAD_OFFICE) ||
+                (user?.role == ROLES.ADMIN && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 shrink-0 border-gray-300 hover:bg-gray-100"
+                    onClick={() => setUserUpdateDialog(true)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                ))}
             </div>
           </CardHeader>
         </Card>

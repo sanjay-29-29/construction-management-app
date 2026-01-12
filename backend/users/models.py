@@ -13,6 +13,7 @@ from .managers import CustomUserManager
 class Roles(models.IntegerChoices):
     HEAD_OFFICE = 1, "Head Office"
     SITE_ENGINEER = 2, "Site Engineer"
+    ADMIN = 3, "Admin"
 
 
 class CustomUser(AbstractUser):

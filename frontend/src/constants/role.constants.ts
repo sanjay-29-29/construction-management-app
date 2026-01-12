@@ -1,6 +1,7 @@
 export const ROLES = {
   HEAD_OFFICE: 'Head Office',
   SITE_ENGINEER: 'Site Engineer',
+  ADMIN: 'Admin',
 } as const;
 
 export const ROLES_DROPDOWN = [

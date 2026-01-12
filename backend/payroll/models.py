@@ -1,16 +1,15 @@
-from django.core.exceptions import ValidationError
 import uuid
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
+from django_resized import ResizedImageField
+from django.core.exceptions import ValidationError
 
-from sites.models import Site
+
+from sites import models as sites_models
 
 
 class Payment(models.Model):
-    work = models.ForeignKey(
-        "RateWork", on_delete=models.CASCADE, related_name="payments"
-    )
     amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -20,7 +19,7 @@ class Payment(models.Model):
     note = models.CharField(max_length=100, default="")
 
     def __str__(self):
-        return f"{self.work} {self.amount}"
+        return f"{self.date_created} {self.amount}"
 
 
 class RateWork(models.Model):
@@ -43,6 +42,17 @@ class RateWork(models.Model):
 
     def __str__(self):
         return f"{self.name} {self.labour}"
+
+
+class RatePayment(Payment):
+    rate = models.ForeignKey(
+        RateWork,
+        on_delete=models.CASCADE,
+        related_name="payments",
+    )
+
+    def __str__(self):
+        return f"{self.rate} {super().__str__()}"
 
 
 class DailyEntry(models.Model):
@@ -84,7 +94,7 @@ class Week(models.Model):
         editable=False,
     )
     site = models.ForeignKey(
-        Site,
+        sites_models.Site,
         related_name="week",
         on_delete=models.CASCADE,
     )
@@ -143,7 +153,7 @@ class Labour(models.Model):
         editable=False,
     )
     site = models.ForeignKey(
-        Site,
+        sites_models.Site,
         on_delete=models.CASCADE,
         related_name="labours",
     )
@@ -153,11 +163,22 @@ class Labour(models.Model):
         decimal_places=2,
         default=0,
     )
+    aadhar_number = models.CharField(max_length=12)
+    bank_account_number = models.CharField(max_length=20)
+    ifsc_code = models.CharField(max_length=30)
+    branch_name = models.CharField(max_length=30)
     type = models.IntegerField(choices=LabourType.choices)
     gender = models.IntegerField(choices=GenderType.choices)
+    photo = ResizedImageField(
+        quality=80,
+        upload_to="labours/",
+        force_format="webp",
+        blank=True,
+        default=None,
+    )
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.name} {self.site}"
 
 
 class WeekLabourAssignment(models.Model):

@@ -130,6 +130,11 @@
 .ag-cell {
   display: flex;
   align-items: center;
+  border-right: 1px solid #dde2eb !important;
+}
+
+.ag-cell:last-child {
+  border-right: none !important;
 }
 
 .ag-cell-wrapper {
@@ -137,4 +142,37 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media print {
+  /* 1. Hide everything else */
+  body * {
+    visibility: hidden;
+  }
+
+  /* 2. Target your grid container */
+  .ag-theme-alpine,
+  .ag-theme-alpine * {
+    visibility: visible;
+  }
+
+  .ag-theme-alpine {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    /* 3. Force the width to fit standard A4 Portrait (~210mm) */
+    width: 100% !important;
+    max-width: 100% !important;
+
+    /* 4. Remove any internal scrolls that flex-1 might trigger */
+    overflow: visible !important;
+  }
+
+  /* Ensure cells don't cut off text when squished */
+  .ag-cell {
+    font-size: 10px !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
 }

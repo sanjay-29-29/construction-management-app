@@ -26,7 +26,6 @@ import type { Material, Order } from '@/types';
 
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 
-
 const materialSchema = z
   .object({
     name: z.string().min(1),
@@ -140,7 +139,8 @@ export const OrderMaterialGridContainer = ({
   }, [order]);
 
   // boolean values
-  const isHeadOffice = user?.role === ROLES.HEAD_OFFICE;
+  const isHeadOffice =
+    user?.role === ROLES.HEAD_OFFICE || user?.role === ROLES.ADMIN;
   const isOrderIncomplete = order?.isCompleted === false;
   const hasMaterials = (order?.materials?.length ?? 0) > 0;
   const isProcessing = mutation.isPending;

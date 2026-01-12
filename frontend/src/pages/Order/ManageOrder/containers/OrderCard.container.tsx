@@ -172,7 +172,9 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
             </div>
           </div>
           <div className="flex gap-2">
-            {(user?.role == ROLES.HEAD_OFFICE || !order?.isCompleted) && (
+            {(user?.role === ROLES.HEAD_OFFICE ||
+              user?.role === ROLES.ADMIN ||
+              !order?.isCompleted) && (
               <Button
                 variant="outline"
                 size="icon"
