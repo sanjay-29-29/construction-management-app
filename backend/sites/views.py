@@ -1,3 +1,4 @@
+from django.db.models.aggregates import Sum
 from rest_framework.generics import ListAPIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -17,17 +18,20 @@ class SiteViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Site.objects.all().prefetch_related("supervisors").reverse()
+        queryset = Site.objects.all().reverse()
+
+        if self.action == "retrieve":
+            queryset = queryset.prefetch_related("supervisors")
 
         # Return all sites for head office
-        if self.request.user.role == Roles.HEAD_OFFICE:
+        if (
+            self.request.user.role == Roles.HEAD_OFFICE
+            or self.request.user.role == Roles.ADMIN
+        ):
             return queryset
 
         # Filter based on user
         queryset = queryset.filter(supervisors__in=[self.request.user])
-
-        if self.action == "list":
-            return queryset
 
         return queryset
 

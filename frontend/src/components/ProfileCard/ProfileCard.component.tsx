@@ -40,7 +40,7 @@ export const ProfileCard = ({
   return (
     <Item
       className={cn(
-        'bg-white hover:bg-white/60 cursor-pointer group transition-all',
+        'border-gray-200 bg-white hover:bg-white/60 cursor-pointer group transition-all',
         className
       )}
     >
@@ -56,7 +56,7 @@ export const ProfileCard = ({
                 {title.charAt(0).toLocaleUpperCase()}
               </AvatarFallback>
             </Avatar>
-          )}{' '}
+          )}
         </ItemMedia>
       )}
 

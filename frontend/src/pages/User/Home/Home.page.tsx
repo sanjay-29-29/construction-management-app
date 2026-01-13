@@ -1,15 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { PlusIcon, Search } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
 import { client } from '@/axios';
 import { ProfileCard } from '@/components/ProfileCard';
-import { Scaffold } from '@/components/Scaffold';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Spinner } from '@/components/ui/spinner';
+import { SearchLayout } from '@/layouts/Search';
 import type { User } from '@/types';
 
 export const HomePage = () => {
@@ -35,62 +30,31 @@ export const HomePage = () => {
   });
 
   return (
-    <Scaffold title="Users">
-      <div className="p-4 bg-white">
-        <Input
-          onChange={(e) => {
-            setSearchText(e.target.value);
-          }}
-          startContent={<Search size={20} />}
-          placeholder="Search by first name, last name"
-        />
-      </div>
-      <Separator />
-      {/* Loading */}
-      {!isError && isLoading && (
-        <div className="pt-32 flex justify-center flex-1">
-          <Spinner />
-        </div>
+    <SearchLayout
+      title="Users"
+      searchPlaceholder="Search by user name, role"
+      onSearchChange={setSearchText}
+      isLoading={isLoading}
+      isError={isError}
+      onRetry={refetch}
+      data={filteredData}
+      emptyText="No users found."
+      bottomLinkTo="create"
+      showBottomLink={true}
+      renderItem={({ id, firstName, lastName, isActive, role }) => (
+        <Link to={id}>
+          <ProfileCard
+            title={`${firstName} ${lastName}`}
+            description={role}
+            badgeText={isActive ? 'Active' : 'Disabled'}
+            badgeClassName={
+              isActive
+                ? 'bg-green-100 text-green-600'
+                : 'bg-red-100 text-red-600'
+            }
+          />
+        </Link>
       )}
-      <div className="grid h-full overflow-y-auto">
-        {/* Error */}
-        {!isLoading && isError && (
-          <div className="flex flex-1 flex-col items-center justify-center text-2xl min-h-100">
-            <p>Error Occurred</p>
-            <Button onClick={() => refetch()} className="mt-4">
-              Retry
-            </Button>
-          </div>
-        )}
-        {/* Success */}
-        {!isLoading && !isError && filteredData?.length === 0 && (
-          <p className="text-gray-500 text-center pt-32">No found.</p>
-        )}
-        {!isLoading &&
-          !isError &&
-          filteredData?.map(({ id, firstName, lastName, role, isActive }) => (
-            <React.Fragment key={id}>
-              <Link to={id}>
-                <ProfileCard
-                  title={`${firstName} ${lastName}`}
-                  description={role}
-                  badgeText={isActive ? 'Active' : 'Disabled'}
-                  badgeClassName={
-                    isActive
-                      ? 'bg-green-100 text-green-600'
-                      : 'bg-red-100 text-red-600'
-                  }
-                />
-              </Link>
-              <Separator />
-            </React.Fragment>
-          ))}
-      </div>
-      <Link to="create">
-        <div className="rounded-full bg-white fixed z-20 bottom-0 right-0 m-5 shadow-xl p-5 border hover:bg-gray-100 active:bg-gray-200">
-          <PlusIcon />
-        </div>
-      </Link>
-    </Scaffold>
+    />
   );
 };

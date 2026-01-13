@@ -2,11 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import {
   Edit,
-  User2,
   HardHat,
   Trash,
-  AlertTriangle,
   Loader2,
+  Landmark,
+  CreditCard,
+  Hash,
+  MapPin,
 } from 'lucide-react';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -21,8 +23,8 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -30,6 +32,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ROLES } from '@/constants/role.constants';
+import { useAuth } from '@/context/Auth';
 import type { Labour } from '@/types';
 
 export const LabourCard = ({
@@ -40,6 +44,7 @@ export const LabourCard = ({
   setLabourUpdateDialog: Dispatch<SetStateAction<boolean>>;
 }) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { siteId } = useParams();
   const [labourToDelete, setLabourToDelete] = useState<string | null>(null);
@@ -72,31 +77,62 @@ export const LabourCard = ({
   });
 
   return (
-    <Card className="border-l-4 border-l-green-600 gap-0 shadow-none">
+    <Card className="border-l-4 border-l-blue-600 gap-0 shadow-none">
       <CardHeader className="pb-4 px-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap justify-between">
-              <CardTitle className="text-lg sm:text-xl truncate">
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
+              <Avatar className="h-16 w-16">
+                <AvatarImage
+                  src={data?.photo ?? undefined}
+                  alt="labour photo"
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <CardTitle className="text-lg sm:text-xl truncate grid">
                 {data?.name}
+                <span className="font-medium text-muted-foreground text-sm">
+                  {data?.gender ?? '—'}
+                </span>
               </CardTitle>
             </div>
 
-            <CardDescription className="mt-3 space-y-2 text-sm">
+            <CardDescription className="mt-8 space-y-2 text-sm">
               {/* Role */}
-              <div className="flex items-center gap-3">
-                <User2 className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium text-muted-foreground">
-                  {data?.gender ?? '—'}
-                </span>
-              </div>
-
               <div className="flex items-center gap-3">
                 <HardHat className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium text-muted-foreground">
                   {data?.type ?? '—'}
                 </span>
               </div>
+              <div className="flex items-center gap-3">
+                {/* Aadhar is an ID/Card */}
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium text-muted-foreground">
+                  {data?.aadharNumber ?? '—'}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                {/* Bank Account is the actual account/bank */}
+                <Landmark className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium text-muted-foreground">
+                  {data?.bankAccountNumber ?? '—'}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                {/* IFSC is a Code/Hash */}
+                <Hash className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium text-muted-foreground">
+                  {data?.ifscCode ?? '—'}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                {/* Branch is a Location */}
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium text-muted-foreground">
+                  {data?.branchName ?? '—'}
+                </span>
+              </div>{' '}
             </CardDescription>
           </div>
 
@@ -108,15 +144,18 @@ export const LabourCard = ({
           >
             <Edit className="h-4 w-4" />
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0 border-red-300 hover:bg-red-100 text-red-600 hover:text-red-600"
-            disabled={deleteMutation.isPending}
-            onClick={() => setLabourToDelete(data?.id ?? null)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
+          {(user?.role === ROLES.ADMIN ||
+            user?.role === ROLES.SITE_ENGINEER) && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 shrink-0 border-red-300 hover:bg-red-100 text-red-600 hover:text-red-600"
+              disabled={deleteMutation.isPending}
+              onClick={() => setLabourToDelete(data?.id ?? null)}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </CardHeader>
       <AlertDialog
@@ -125,10 +164,6 @@ export const LabourCard = ({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="flex items-center gap-2 justify-center">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              <AlertDialogTitle>Delete Labour</AlertDialogTitle>
-            </div>
             <AlertDialogDescription>
               Are you sure you want to delete this labour? This action cannot be
               undone.

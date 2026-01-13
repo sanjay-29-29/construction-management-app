@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import {
-  AlertTriangle,
   Building2,
   Calendar,
   Edit,
@@ -25,7 +24,6 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
@@ -51,7 +49,6 @@ import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { ROLES } from '@/constants/role.constants';
 import { useAuth } from '@/context/Auth';
 import { formatDate, formatNumber } from '@/lib/utils';
 import type { Order } from '@/types';
@@ -59,7 +56,7 @@ import type { Order } from '@/types';
 export type OrderCardContainerType = { order?: Order };
 
 export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
-  const { user } = useAuth();
+  const { isHeadOffice } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -144,7 +141,7 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
     if (isUpdateDialogOpen && order) {
       form.reset(order);
     }
-  }, [order, isUpdateDialogOpen]);
+  }, [order, isUpdateDialogOpen, form]);
 
   return (
     <Card className="border-l-4 border-l-orange-600 gap-0 shadow-none">
@@ -172,9 +169,7 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
             </div>
           </div>
           <div className="flex gap-2">
-            {(user?.role === ROLES.HEAD_OFFICE ||
-              user?.role === ROLES.ADMIN ||
-              !order?.isCompleted) && (
+            {(isHeadOffice || !order?.isCompleted) && (
               <Button
                 variant="outline"
                 size="icon"
@@ -185,7 +180,7 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
                 <Edit className="h-4 w-4" />
               </Button>
             )}
-            {user?.role == ROLES.HEAD_OFFICE && (
+            {isHeadOffice && (
               <Button
                 variant="outline"
                 size="icon"
@@ -203,10 +198,6 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="flex items-center gap-2 justify-center">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              <AlertDialogTitle>Delete Order</AlertDialogTitle>
-            </div>
             <AlertDialogDescription>
               Are you sure you want to delete this order? This action cannot be
               undone.
@@ -259,7 +250,7 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
           {/* Materials & Cost */}
           <div className="grid gap-4">
             <div className="text-right grid gap-4">
-              {user?.role == ROLES.HEAD_OFFICE && (
+              {isHeadOffice && (
                 <>
                   <div>
                     <p className="text-xs text-gray-500">Total Cost</p>
@@ -320,7 +311,7 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid gap-5 mb-4">
-                {user?.role === ROLES.HEAD_OFFICE && (
+                {isHeadOffice && (
                   <>
                     <FormField
                       name="name"

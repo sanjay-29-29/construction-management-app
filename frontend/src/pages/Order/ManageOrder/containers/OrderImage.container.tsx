@@ -3,14 +3,7 @@ import {
   AlertDialogDescription,
 } from '@radix-ui/react-alert-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  AlertTriangle,
-  Edit,
-  Loader2,
-  Save,
-  UploadCloud,
-  X,
-} from 'lucide-react';
+import { Edit, Loader2, Save, UploadCloud, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -21,7 +14,6 @@ import {
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import type { Order } from '@/types';
@@ -273,10 +265,6 @@ export const OrderImage = ({ order }: { order?: Order }) => {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="flex items-center gap-2 justify-center">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              <AlertDialogTitle>Delete Image</AlertDialogTitle>
-            </div>
             <AlertDialogDescription>
               Are you sure you want to delete this image? This action cannot be
               undone.

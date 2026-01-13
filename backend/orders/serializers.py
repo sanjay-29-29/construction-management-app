@@ -149,7 +149,12 @@ class OrderSerializer(serializers.ModelSerializer):
             user = request.user if request else None
             user_name = user.get_full_name() if user else "Someone"
 
-            FCMDevice.objects.filter(user__role=Roles.HEAD_OFFICE).send_message(
+            FCMDevice.objects.filter(
+                user__role__in=[
+                    Roles.HEAD_OFFICE,
+                    Roles.ADMIN,
+                ]
+            ).send_message(
                 Message(
                     notification=Notification(
                         title="Order Updated",

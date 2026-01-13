@@ -8,6 +8,8 @@ from .models import (
     WeekLabourAssignment,
     Payment,
     RateWork,
+    RatePayment,
+    LabourDocument,
 )
 
 
@@ -43,4 +45,14 @@ class PaymentAdmin(admin.ModelAdmin):
 
 @admin.register(RateWork)
 class RateWorkAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(RatePayment)
+class RatePaymentAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(LabourDocument)
+class LabourDocumentAdmin(admin.ModelAdmin):
     pass

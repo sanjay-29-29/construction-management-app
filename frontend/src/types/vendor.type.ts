@@ -1,3 +1,5 @@
+import type { Payment } from './ratework.type';
+
 export type Vendor = {
   id: string;
   name: string;
@@ -5,4 +7,5 @@ export type Vendor = {
   notes?: string;
   amountPaid?: number;
   orderCost?: number;
+  payments?: Payment[];
 };

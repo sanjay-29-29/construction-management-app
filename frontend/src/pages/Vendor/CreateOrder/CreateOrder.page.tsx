@@ -39,7 +39,6 @@ import {
 import { cn } from '@/lib/utils';
 import type { DropdownType, Vendor } from '@/types';
 
-
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 
 const materialSchema = z.object({
@@ -65,7 +64,7 @@ const createOrderSchema = z.object({
 type CreateOrderFormValues = z.infer<typeof createOrderSchema>;
 
 export const CreateOrderPage = () => {
-  const { id } = useParams();
+  const { vendorId } = useParams();
   const [open, setOpen] = useState(false);
 
   const {
@@ -73,9 +72,9 @@ export const CreateOrderPage = () => {
     isLoading: vendorLoading,
     isError: vendorError,
   } = useQuery({
-    queryKey: ['vendors', id],
+    queryKey: ['vendors', vendorId],
     queryFn: async () => {
-      const response = await client.get<Vendor>(`vendors/${id}/`);
+      const response = await client.get<Vendor>(`vendors/${vendorId}/`);
       return response.data;
     },
   });
@@ -110,7 +109,7 @@ export const CreateOrderPage = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: CreateOrderFormValues) => {
-      await client.post('orders/', { ...data, vendor: id });
+      await client.post('orders/', { ...data, vendor: vendorId });
     },
     onSuccess: () => {
       toast.success('Order Created Successfully.');
@@ -343,8 +342,8 @@ export const CreateOrderPage = () => {
   }
 
   return (
-    <Scaffold title="Create Order">
-      <div className="p-4 bg-white flex-1 pb-20">
+    <Scaffold title="Create Order" disablePadding>
+      <div className="p-4 bg-white flex-1 pb-20 lg:m-4 lg:rounded-md lg:flex-initial lg:p-4">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit, onError)}
@@ -411,14 +410,13 @@ export const CreateOrderPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Site</FormLabel>
-
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant="outline"
                           role="combobox"
-                          disabled={mutation.isPending}
+                          disabled={mutation.isPending || siteDropdownLoading}
                           className="justify-between font-normal"
                         >
                           {field.value
@@ -429,7 +427,6 @@ export const CreateOrderPage = () => {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-
                     <PopoverContent className="p-0 w-(--radix-popover-trigger-width) max-h-64 overflow-y-auto">
                       <Command>
                         <CommandInput placeholder="Select Site" />
@@ -522,25 +519,20 @@ export const CreateOrderPage = () => {
                 />
               </div>
             </div>
+            <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3 lg:static lg:mt-6 lg:flex lg:justify-end lg:bg-transparent lg:border-none lg:p-0">
+              <Button className="w-full h-12 text-base font-medium lg:w-auto lg:h-auto">
+                {mutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create'
+                )}
+              </Button>
+            </div>
           </form>
         </Form>
-
-        <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3">
-          <Button
-            onClick={form.handleSubmit(onSubmit, onError)}
-            className="w-full h-12 text-base font-medium"
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Creating...
-              </>
-            ) : (
-              'Create'
-            )}
-          </Button>
-        </div>
       </div>
     </Scaffold>
   );

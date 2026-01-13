@@ -22,7 +22,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { MultiSelect } from '@/components/ui/multi-select';
 
-
 const createSiteSchema = z.object({
   name: z.string().min(1, { error: 'Please enter a valid name' }),
   address: z.string().min(1, { error: 'Please enter a valid address' }),
@@ -79,10 +78,10 @@ export const CreateSitePage = () => {
   }, [error]);
 
   return (
-    <Scaffold title="Create Site">
-      <div className="p-4 pb-24 bg-white flex-1">
+    <Scaffold title="Create Site" disablePadding>
+      <div className="p-4 pb-24 bg-white flex-1 lg:m-8 lg:rounded-md lg:flex-initial lg:p-4">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5">
             <FormField
               control={form.control}
               name="name"
@@ -143,25 +142,20 @@ export const CreateSitePage = () => {
                 </FormItem>
               )}
             />
+            <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3 lg:static lg:mt-6 lg:flex lg:justify-end lg:bg-transparent lg:border-none lg:p-0">
+              <Button className="w-full h-12 text-base font-medium lg:w-auto lg:h-auto">
+                {mutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create'
+                )}
+              </Button>
+            </div>
           </form>
         </Form>
-      </div>
-
-      {/* Bottom CTA */}
-      <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3">
-        <Button
-          onClick={form.handleSubmit(onSubmit)}
-          className="w-full h-12 text-base font-medium"
-        >
-          {mutation.isPending ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Creating...
-            </>
-          ) : (
-            'Create'
-          )}
-        </Button>
       </div>
     </Scaffold>
   );

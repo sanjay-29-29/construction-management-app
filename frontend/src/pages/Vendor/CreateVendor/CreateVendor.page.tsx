@@ -59,10 +59,10 @@ export const CreateVendorPage = () => {
   };
 
   return (
-    <Scaffold title="Create Vendor">
-      <div className="p-4 mb-20 flex-1 bg-white">
+    <Scaffold title="Create Vendor" disablePadding>
+      <div className="p-4 pb-24 flex-1 bg-white lg:m-8 lg:rounded-md lg:flex-initial lg:p-4">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5">
             <FormField
               name="name"
               control={form.control}
@@ -117,28 +117,21 @@ export const CreateVendorPage = () => {
                   <FormMessage />
                 </FormItem>
               )}
-            />{' '}
+            />
+            <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3 lg:static lg:mt-6 lg:flex lg:justify-end lg:bg-transparent lg:border-none lg:p-0">
+              <Button className="w-full h-12 text-base font-medium lg:w-auto lg:h-auto">
+                {mutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create'
+                )}
+              </Button>
+            </div>
           </form>
         </Form>
-      </div>
-
-      {/* Bottom CTA */}
-      <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3">
-        <Button
-          type="submit"
-          className="w-full h-12 text-base font-medium"
-          onClick={form.handleSubmit(onSubmit)}
-          disabled={mutation.isPending}
-        >
-          {mutation.isPending ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Creating...
-            </>
-          ) : (
-            'Create'
-          )}
-        </Button>
       </div>
     </Scaffold>
   );

@@ -1,9 +1,21 @@
+from django.urls.conf import path
 from rest_framework import routers
 
-from .views import VendorViewSet
+from . import views as views
 
 router = routers.DefaultRouter()
 
-router.register("vendors", VendorViewSet, basename="vendors")
+router.register("vendors", views.VendorViewSet, basename="vendors")
 
-urlpatterns = router.urls
+urlpatterns = [
+    path(
+        "vendors/<uuid:vendor_id>/payments/",
+        views.VendorPaymentCreateView.as_view(),
+    ),
+    path(
+        "vendors/<uuid:vendor_id>/payments/<uuid:pk>/",
+        views.VendorPaymentDeleteView.as_view(),
+    ),
+]
+
+urlpatterns += router.urls

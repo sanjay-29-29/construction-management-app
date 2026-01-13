@@ -10,7 +10,6 @@ import type { Labour, Week } from '@/types';
 import { AttendanceGrid } from './containers/AttendanceGrid.container';
 import { LabourContainer } from './containers/Labours.container';
 
-
 export const ManageAttendance = () => {
   const { siteId, weekId } = useParams();
 
@@ -54,7 +53,7 @@ export const ManageAttendance = () => {
 
   return (
     <Scaffold title={`Week of ${formatDate(attendanceData?.startDate)}`}>
-      <div className="flex flex-col h-full p-4 gap-10">
+      <div className="flex flex-col h-full gap-16">
         <AttendanceGrid data={attendanceData} />
         <LabourContainer data={data} siteId={siteId} weekId={weekId} />
       </div>

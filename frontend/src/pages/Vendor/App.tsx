@@ -10,8 +10,8 @@ export const App = () => {
     <Routes>
       <Route element={<HomePage />} index />
       <Route element={<CreateVendorPage />} path="create" />
-      <Route element={<ManageVendorPage />} path=":id" />
-      <Route element={<CreateOrderPage />} path=":id/order" />
+      <Route element={<ManageVendorPage />} path=":vendorId" />
+      <Route element={<CreateOrderPage />} path=":vendorId/order" />
     </Routes>
   );
 };

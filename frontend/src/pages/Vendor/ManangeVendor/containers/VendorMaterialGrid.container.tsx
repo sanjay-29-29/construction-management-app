@@ -1,8 +1,10 @@
 import { AgGridReact } from 'ag-grid-react';
-import { useNavigate } from 'react-router';
+import { Plus } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
 
 import { client } from '@/axios';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { formatDate, formatNumber } from '@/lib/utils';
 import type { Order, Vendor } from '@/types';
 
@@ -13,7 +15,6 @@ import type {
   RowClickedEvent,
   ValueFormatterParams,
 } from 'ag-grid-community';
-
 
 export const VendorMaterialGrid = ({ vendor }: { vendor?: Vendor }) => {
   const navigate = useNavigate();
@@ -167,8 +168,16 @@ export const VendorMaterialGrid = ({ vendor }: { vendor?: Vendor }) => {
   };
 
   return (
-    <>
-      <div className="text-xl font-semibold my-5">Your Orders</div>
+    <div>
+      <div className="flex items-center justify-between mb-5">
+        <div className="text-xl font-semibold">Your Orders</div>
+        <Link to="order">
+          <Button variant="outline">
+            <Plus />
+            Add Order
+          </Button>
+        </Link>
+      </div>
       <div className="w-full max-h-100 overflow-auto h-100">
         <AgGridReact
           columnDefs={columnDefs}
@@ -176,11 +185,14 @@ export const VendorMaterialGrid = ({ vendor }: { vendor?: Vendor }) => {
           rowModelType="infinite"
           cacheBlockSize={20}
           maxBlocksInCache={10}
+          headerHeight={44}
+          rowHeight={54}
           onGridReady={onGridReady}
           onRowClicked={onRowClicked}
           suppressMovableColumns
+          suppressCellFocus
         />
       </div>
-    </>
+    </div>
   );
 };

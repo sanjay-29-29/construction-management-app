@@ -7,11 +7,10 @@ import { client } from '@/axios';
 import { useAuth } from '@/context/Auth';
 import type { User } from '@/types';
 
-
 import { LoaderPage } from '../LoaderPage';
 
 export const ProtectedRoute = () => {
-  const { isAuth, setIsAuth, user, setUser, clearAuth } = useAuth();
+  const { isAuth, setIsAuth, user, setUser, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -26,7 +25,7 @@ export const ProtectedRoute = () => {
       setUser(response.data);
       setIsAuth(true);
     } catch (error) {
-      clearAuth();
+      logout();
       if (isAxiosError(error)) {
         navigate('/login');
         return;

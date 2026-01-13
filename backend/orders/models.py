@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 from django_resized import ResizedImageField
 
 from sites.models import Site
-from payroll import models as payroll_models
 from vendors.models import Vendor
 
 
@@ -45,17 +44,6 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.name} | {self.site}"
-
-
-class OrderPayment(payroll_models.Payment):
-    order = models.ForeignKey(
-        Order,
-        on_delete=models.CASCADE,
-        related_name="payments",
-    )
-
-    def __str__(self):
-        return f"{self.order} {super().__str__()}"
 
 
 class OrderImage(models.Model):

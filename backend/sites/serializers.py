@@ -15,6 +15,7 @@ class ListSiteSerializer(serializers.ModelSerializer):
 
 
 class RetrieveSiteSerializer(ListSiteSerializer):
+    total_order_cost = serializers.FloatField(read_only=True)
     supervisors = UserSerializer(many=True, read_only=True)
 
 

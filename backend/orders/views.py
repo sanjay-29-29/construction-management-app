@@ -31,14 +31,6 @@ class OrderViewSet(ModelViewSet):
             return OrderRetrieveSerializer
         return OrderSerializer
 
-    def destroy(self, request, *args, **kwargs):
-        with transaction.atomic():
-            order = self.get_object()
-
-            for image in order.images.all():
-                image.delete()
-        return super().destroy(request, *args, **kwargs)
-
 
 class ListOrder(generics.ListAPIView):
     serializer_class = OrderListSerializer
@@ -218,7 +210,6 @@ class ListOrderByVendor(ListOrder):
 
 
 class OrderImageUploadView(GenericAPIView):
-
     serializer_class = OrderImageCreateSerializer
 
     def post(self, request, order_id):
@@ -246,5 +237,5 @@ class OrderImageDeleteView(DestroyAPIView):
     lookup_url_kwarg = "image_id"
 
     def get_queryset(self):
-        order_id = self.kwargs["order_id"]
+        order_id = self.kwargs.get("order_id")
         return OrderImage.objects.filter(order_id=order_id)

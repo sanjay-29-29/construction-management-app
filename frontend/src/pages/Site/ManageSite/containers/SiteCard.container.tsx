@@ -50,7 +50,7 @@ export const SiteCard = ({
               </span>
             </CardDescription>
           </div>
-          {user?.role === ROLES.HEAD_OFFICE && (
+          {(user?.role === ROLES.HEAD_OFFICE || user?.role === ROLES.ADMIN) && (
             <Button
               variant="outline"
               size="icon"

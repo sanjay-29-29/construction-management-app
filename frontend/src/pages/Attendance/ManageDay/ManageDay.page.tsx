@@ -21,10 +21,6 @@ import type { AttendanceEntry, DailyEntry, Labour } from '@/types';
 
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 
-
-
-
-
 const attendanceRowSchema = z.object({
   labour: z.string().min(1, 'Labour ID is required'),
   name: z.string().min(1, 'Name is required'),
@@ -82,7 +78,6 @@ export const ManageDay = () => {
 
   useEffect(() => {
     if (data) {
-      console.log(transformDataForForm(data));
       form.reset(transformDataForForm(data));
     }
   }, [data, form]);

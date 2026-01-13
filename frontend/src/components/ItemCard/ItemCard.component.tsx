@@ -16,8 +16,8 @@ export const ItemCard = ({
     <Link to={to}>
       <div
         className={cn(
-          'group relative flex items-center gap-4 rounded-xl border bg-card p-4 transition-all   cursor-pointer',
-          className ? className : 'hover:bg-muted/50'
+          'group relative flex items-center gap-4 rounded-xl border bg-card p-4 transition-all cursor-pointer',
+          className ? className : 'hover:bg-gray-50/10'
         )}
       >
         {icon}

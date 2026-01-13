@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Edit, MapPin } from 'lucide-react';
 import { useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router';
+import { Navigate, useParams } from 'react-router';
 
 import { client } from '@/axios';
 import { LoaderPage } from '@/components/LoaderPage';
@@ -9,7 +9,6 @@ import { Scaffold } from '@/components/Scaffold';
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -19,10 +18,10 @@ import type { Vendor } from '@/types';
 
 import { UpdateVendorContainer } from './containers/UpdateVendor.container';
 import { VendorMaterialGrid } from './containers/VendorMaterialGrid.container';
-
+import { VendorPaymentContainer } from './containers/VendorPayment.container';
 
 export const ManageVendorPage = () => {
-  const { id } = useParams();
+  const { vendorId } = useParams();
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
   const {
@@ -30,9 +29,9 @@ export const ManageVendorPage = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['vendors', id],
+    queryKey: ['vendors', vendorId],
     queryFn: async () => {
-      const response = await client.get<Vendor>(`vendors/${id}/`);
+      const response = await client.get<Vendor>(`vendors/${vendorId}/`);
       return response.data;
     },
   });
@@ -47,7 +46,7 @@ export const ManageVendorPage = () => {
 
   return (
     <Scaffold title="Manage Vendor">
-      <div className="p-4 max-w-full overflow-x-hidden space-y-10">
+      <div className="max-w-full overflow-x-hidden flex flex-col gap-16">
         <Card className="border-l-4 border-l-purple-600 gap-0 shadow-none">
           <CardHeader className="pb-4 px-4">
             <div className="flex items-start justify-between gap-3">
@@ -106,13 +105,9 @@ export const ManageVendorPage = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="px-4 pb-4 flex items-center justify-end">
-            <Link to="order">
-              <Button variant="outline">Add Order</Button>
-            </Link>
-          </CardContent>
         </Card>
         <VendorMaterialGrid vendor={vendor} />
+        <VendorPaymentContainer data={vendor} />
       </div>
       <UpdateVendorContainer
         vendor={vendor}

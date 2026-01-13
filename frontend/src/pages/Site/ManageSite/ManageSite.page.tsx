@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClipboardCheck, Users2 } from 'lucide-react';
+import { ClipboardCheck, Hammer, Users2 } from 'lucide-react';
 import { useState } from 'react';
 import { Navigate, useParams } from 'react-router';
 
@@ -39,11 +39,11 @@ export const ManageSite = () => {
 
   return (
     <Scaffold title="Manage Site">
-      <div className="p-4 max-w-full flex flex-col gap-10">
+      <div className="max-w-full flex flex-col gap-16">
         <SiteCard setSiteUpdateDialog={setSiteUpdateDialog} site={site} />
         <div>
-          <div className="text-xl font-semibold mb-5">NMR</div>
-          <div className="grid space-y-4">
+          <div className="text-xl font-semibold mb-5">Actions</div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <ItemCard
               title="Mark Attendance"
               description="View and mark attendance"
@@ -62,6 +62,17 @@ export const ManageSite = () => {
               icon={
                 <div className="bg-blue-100 p-2 rounded-lg">
                   <Users2 className="h-6 w-6 text-blue-600" />
+                </div>
+              }
+              className="hover:bg-white/60"
+            />
+            <ItemCard
+              title="Rate Work"
+              description="View and create rate work"
+              to="rate-work"
+              icon={
+                <div className="bg-blue-100 p-2 rounded-lg">
+                  <Hammer className="h-6 w-6 text-blue-600" />
                 </div>
               }
               className="hover:bg-white/60"

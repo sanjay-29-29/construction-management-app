@@ -14,3 +14,5 @@ django-resized
 Pillow
 gunicorn
 django-probes
+django-filter
+django-cleanup

@@ -159,9 +159,12 @@ export const SiteOrderGrid = ({ site }: { site?: Site }) => {
           rowModelType="infinite"
           cacheBlockSize={20}
           maxBlocksInCache={10}
+          headerHeight={44}
+          rowHeight={54}
           onGridReady={onGridReady}
           onRowClicked={onRowClicked}
           suppressMovableColumns
+          suppressCellFocus
         />
       </div>
     </div>

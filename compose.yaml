@@ -24,6 +24,8 @@ services:
 
   nginx:
     build: ./frontend
+    env_file:
+      - ./frontend/.env
     container_name: nginx-docker
     ports:
       - "80:80"

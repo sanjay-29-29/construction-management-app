@@ -71,7 +71,7 @@ type UpdateUserFormValues = z.infer<typeof updateUserSchema>;
 
 export const ManageUserPage = () => {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { isHeadOffice, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [isUserUpdateDialogOpen, setUserUpdateDialog] =
     useState<boolean>(false);
@@ -152,70 +152,69 @@ export const ManageUserPage = () => {
 
   return (
     <Scaffold title="Manage User">
-      <div className="p-4">
-        <Card className="border-l-4 border-l-green-600 gap-0 shadow-none">
-          {/* HEADER */}
-          <CardHeader className="pb-4 px-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1 flex-wrap justify-between">
-                  <CardTitle className="text-lg sm:text-xl truncate">
-                    {`${currentUser?.firstName} ${currentUser?.lastName}`}
-                  </CardTitle>
+      <Card className="border-l-4 border-l-green-600 gap-0 shadow-none">
+        {/* HEADER */}
+        <CardHeader className="pb-4 px-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap justify-between">
+                <CardTitle className="text-lg sm:text-xl truncate">
+                  {`${currentUser?.firstName} ${currentUser?.lastName}`}
+                </CardTitle>
 
-                  <Badge
-                    className={`shrink-0 ${
-                      currentUser?.isActive
-                        ? 'bg-green-100 text-green-600'
-                        : 'bg-red-100 text-red-600'
-                    }`}
-                  >
-                    {currentUser?.isActive ? 'Active' : 'Disabled'}
-                  </Badge>
+                <Badge
+                  className={`shrink-0 ${
+                    currentUser?.isActive
+                      ? 'bg-green-100 text-green-600'
+                      : 'bg-red-100 text-red-600'
+                  }`}
+                >
+                  {currentUser?.isActive ? 'Active' : 'Disabled'}
+                </Badge>
+              </div>
+
+              <CardDescription className="mt-3 space-y-2 text-sm">
+                {/* Role */}
+                <div className="flex items-center gap-3">
+                  <Building className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium text-muted-foreground">
+                    {currentUser?.role ?? '—'}
+                  </span>
                 </div>
 
-                <CardDescription className="mt-3 space-y-2 text-sm">
-                  {/* Role */}
-                  <div className="flex items-center gap-3">
-                    <Building className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium text-muted-foreground">
-                      {currentUser?.role ?? '—'}
-                    </span>
-                  </div>
+                {/* Phone */}
+                <div className="flex items-center gap-3">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">
+                    {currentUser?.phone ?? '—'}
+                  </span>
+                </div>
 
-                  {/* Phone */}
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      {currentUser?.phone ?? '—'}
-                    </span>
-                  </div>
-
-                  {/* Email */}
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="truncate text-muted-foreground">
-                      {currentUser?.email ?? '—'}
-                    </span>
-                  </div>
-                </CardDescription>
-              </div>
-              {(user?.role === ROLES.SITE_ENGINEER &&
-                currentUser?.role == ROLES.HEAD_OFFICE) ||
-                (user?.role == ROLES.ADMIN && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-9 w-9 shrink-0 border-gray-300 hover:bg-gray-100"
-                    onClick={() => setUserUpdateDialog(true)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                ))}
+                {/* Email */}
+                <div className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="truncate text-muted-foreground">
+                    {currentUser?.email ?? '—'}
+                  </span>
+                </div>
+              </CardDescription>
             </div>
-          </CardHeader>
-        </Card>
-      </div>
+            {(isAdmin ||
+              (isHeadOffice &&
+                (currentUser?.role === ROLES.HEAD_OFFICE ||
+                  currentUser?.role === ROLES.SITE_ENGINEER))) && (
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 shrink-0 border-gray-300 hover:bg-gray-100"
+                onClick={() => setUserUpdateDialog(true)}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+      </Card>
       <Dialog open={isUserUpdateDialogOpen} onOpenChange={setUserUpdateDialog}>
         <DialogContent>
           <DialogHeader>
@@ -413,34 +412,32 @@ export const ManageUserPage = () => {
                   )}
                 />
               </div>
+              <DialogFooter>
+                <Button
+                  className="border-red-200 border text-red-500 hover:bg-red-50 hover:text-red-600"
+                  variant="outline"
+                  disabled={mutation.isPending}
+                  type="button"
+                  onClick={() => {
+                    setUserUpdateDialog(false);
+                    form.reset();
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button variant="outline" disabled={mutation.isPending}>
+                  {mutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />{' '}
+                      Saving...
+                    </>
+                  ) : (
+                    'Save'
+                  )}
+                </Button>
+              </DialogFooter>
             </form>
           </Form>
-          <DialogFooter>
-            <Button
-              className="border-red-200 border text-red-500 hover:bg-red-50 hover:text-red-600"
-              variant="outline"
-              disabled={mutation.isPending}
-              onClick={() => {
-                setUserUpdateDialog(false);
-                form.reset();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="outline"
-              disabled={mutation.isPending}
-              onClick={form.handleSubmit(onSubmit)}
-            >
-              {mutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                </>
-              ) : (
-                'Save'
-              )}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </Scaffold>

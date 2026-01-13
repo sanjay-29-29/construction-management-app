@@ -1,13 +1,15 @@
 import { Route, Routes } from 'react-router';
 
-import { SiteAttendanceHome } from './AttendanceHome';
+import {
+  SiteAttendanceHome,
+  ManageAttendance,
+  ManageDay,
+} from '@/pages/Attendance';
+import { LabourHome, LabourCreate, ManageLabour } from '@/pages/Labour';
+import { RateWorkHome, ManageRateWork } from '@/pages/RateWork';
+
 import { CreateSitePage } from './CreateSite';
 import { HomePage } from './Home';
-import { LabourCreate } from './LabourCreate';
-import { LabourHome } from './LabourHome';
-import { ManageAttendance } from './ManageAttendace';
-import { ManageDay } from './ManageDay/ManageDay.page';
-import { ManageLabour } from './ManageLabour';
 import { ManageSite } from './ManageSite';
 
 export const App = () => {
@@ -26,6 +28,10 @@ export const App = () => {
           <Route index element={<LabourHome />} />
           <Route path="create" element={<LabourCreate />} />
           <Route path=":labourId" element={<ManageLabour />} />
+        </Route>
+        <Route path="rate-work">
+          <Route index element={<RateWorkHome />} />
+          <Route path=":rateWorkId" element={<ManageRateWork />} />
         </Route>
       </Route>
     </Routes>

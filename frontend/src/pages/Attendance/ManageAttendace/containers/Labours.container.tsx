@@ -45,7 +45,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { formatNumber } from '@/lib/utils';
-import type { Labour } from '@/types';
+import type { DropdownType, Labour } from '@/types';
 
 const addLabourSchema = z.object({
   labour: z.string('Please select a labour'),
@@ -68,12 +68,12 @@ const AddLabourDialog = ({
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: availableLabours, isLoading: isLoadingLabours } = useQuery<
-    Labour[]
-  >({
-    queryKey: ['sites', siteId, 'labours'],
+  const { data: availableLabours, isLoading: isLoadingLabours } = useQuery({
+    queryKey: ['sites', siteId, 'labours', 'dropdown', 1],
     queryFn: async () => {
-      const res = await client.get(`sites/${siteId}/labours/`);
+      const res = await client.get<DropdownType[]>(
+        `sites/${siteId}/labours/dropdown/?type=1`
+      );
       return res.data;
     },
     enabled: open,
@@ -115,7 +115,7 @@ const AddLabourDialog = ({
   };
 
   const selectableLabours = availableLabours?.filter(
-    (l) => !existingLabours.some((existing) => existing.id === l.id)
+    (l) => !existingLabours.some((existing) => existing.id === l.value)
   );
 
   return (
@@ -153,7 +153,9 @@ const AddLabourDialog = ({
                   >
                     <FormControl>
                       <SelectTrigger
-                        disabled={isLoadingLabours}
+                        disabled={
+                          isLoadingLabours || selectableLabours?.length === 0
+                        }
                         className="w-full h-9"
                       >
                         <SelectValue
@@ -170,8 +172,8 @@ const AddLabourDialog = ({
                         </div>
                       ) : (
                         selectableLabours?.map((labour) => (
-                          <SelectItem key={labour.id} value={labour.id}>
-                            {labour.name}
+                          <SelectItem key={labour.value} value={labour.value}>
+                            {labour.label}
                           </SelectItem>
                         ))
                       )}
@@ -244,8 +246,11 @@ export const LabourContainer = ({
       // Close dialog on success
       setLabourToDelete(null);
     },
-    onError: () => {
-      toast.error('Error removing labour');
+    onError: (error) => {
+      if (isAxiosError(error)) {
+        toast.error('Error occurred while removing labour.');
+      }
+      toast.error('Unknown error occurred.');
     },
   });
 

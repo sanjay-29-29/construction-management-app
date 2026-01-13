@@ -14,7 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ROLES } from '@/constants/role.constants';
 import { useAuth } from '@/context/Auth';
 import { cn, formatDate, formatNumber } from '@/lib/utils';
 import type { AttendanceEntry, Labour, Week } from '@/types';
@@ -29,7 +28,7 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
   const navigate = useNavigate();
   const { siteId, weekId } = useParams();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { isHeadOffice } = useAuth();
 
   const mutation = useMutation({
     mutationFn: async ({
@@ -44,7 +43,7 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
       });
     },
     onSuccess: () => {
-      toast.success('The day has been unlocked for editing.');
+      toast.success(`The day has been edited.`);
       queryClient.invalidateQueries({
         queryKey: ['sites', siteId, 'weeks', weekId],
       });
@@ -60,7 +59,12 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
 
   const rowData = useMemo(() => {
     return data?.labours?.map((labour) => {
-      const row: AttendanceGridRow = { ...labour };
+      const row: AttendanceGridRow = {
+        name: labour.name,
+        id: labour.id,
+        type: labour.type,
+        gender: labour.gender,
+      };
       let weeklyTotal = 0;
       let toPayAtWeekend = labour.openingBalance ?? 0;
 
@@ -133,8 +137,6 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
             isEditable: boolean;
             id: string;
           }) => {
-            const isHeadOffice =
-              user?.role === ROLES.HEAD_OFFICE || user?.role === ROLES.ADMIN;
             const showDropdown = isHeadOffice || isEditable;
             if (!showDropdown) {
               return (
@@ -303,14 +305,14 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
 
       {
         field: 'weeklyTotal',
-        headerName: 'Amount Paid',
+        headerName: 'Total Paid',
         width: 120,
         cellClass:
           'bg-emerald-50 font-semibold flex items-center justify-center border-emerald-200',
         valueFormatter: (params) => `₹ ${formatNumber(params.value)}`,
       },
     ];
-  }, [data, navigate, user, mutation]);
+  }, [data, navigate, isHeadOffice, mutation]);
 
   const footerData = useMemo(() => {
     if (!rowData) return [];
@@ -337,7 +339,7 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
           <PrinterIcon />
         </Button>
       </div>
-      <div className="h-120 sm:h-200 overflow-auto create-order ag-theme-alpine">
+      <div className="h-120 sm:h-200 overflow-auto create-order ag-theme-alpine cell-border">
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}

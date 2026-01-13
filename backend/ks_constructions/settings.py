@@ -54,10 +54,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_probes",
+    "django_cleanup.apps.CleanupConfig",
     "phonenumber_field",
     "corsheaders",
     "storages",
     "fcm_django",
+    "django_filters",
     "rest_framework",
     "rest_framework.authtoken",
     "users",
@@ -84,7 +86,10 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
-    ]
+    ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
 }
 
 ROOT_URLCONF = "ks_constructions.urls"
@@ -111,18 +116,18 @@ WSGI_APPLICATION = "ks_constructions.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
     # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": env("POSTGRES_DB"),
-    #     "USER": env("POSTGRES_USER"),
-    #     "PASSWORD": env("POSTGRES_PASSWORD"),
-    #     "HOST": "db",
-    #     "PORT": env("POSTGRES_PORT"),
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
     # }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": "db",
+        "PORT": env("POSTGRES_PORT"),
+    }
 }
 
 

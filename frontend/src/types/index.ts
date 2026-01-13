@@ -9,3 +9,4 @@ export type {
   AttendanceEntry,
   DailyEntry,
 } from './attendance.type';
+export type { RateWork, Payment } from './ratework.type.ts';

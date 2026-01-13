@@ -22,8 +22,8 @@ function App() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <BrowserRouter>
+        <BrowserRouter>
+          <AuthProvider>
             <PushNotificationsInit />
             <BackButtonHandler />
             <Routes>
@@ -37,8 +37,8 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
-          </BrowserRouter>
-        </AuthProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </QueryClientProvider>
       <Toaster position="top-right" richColors className="mt-10" />
     </>

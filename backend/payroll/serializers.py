@@ -1,23 +1,74 @@
 from django.db import transaction
 from rest_framework import serializers
 
+
 from . import models as models
 
 
-class RateWorkSerializerListRetrieveSerializer(serializers.ModelSerializer):
+class RateWorkPaymentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ["id", "amount", "note", "date_created"]
+        read_only_fields = ["date_created"]
+        model = models.RatePayment
+
+
+class RateWorkListSerializer(serializers.ModelSerializer):
     quantity = serializers.FloatField()
-    amount = serializers.FloatField()
+    cost_per_unit = serializers.FloatField()
+    labour_name = serializers.CharField(source="labour.name", read_only=True)
 
     class Meta:
         model = models.RateWork
-        fields = ["name", "quantity", "amount", "id"]
+        fields = [
+            "name",
+            "quantity",
+            "cost_per_unit",
+            "id",
+            "is_completed",
+            "labour_name",
+            "unit",
+        ]
+
+
+class RateWorkRetrieveSerializer(serializers.ModelSerializer):
+    quantity = serializers.FloatField()
+    cost_per_unit = serializers.FloatField()
+    labour_name = serializers.CharField(source="labour.name", read_only=True)
+    payments = RateWorkPaymentSerializer(many=True, read_only=True)
+    paid = serializers.FloatField(read_only=True)
+
+    class Meta:
+        model = models.RateWork
+        fields = [
+            "paid",
+            "name",
+            "quantity",
+            "cost_per_unit",
+            "id",
+            "is_completed",
+            "labour_name",
+            "unit",
+            "payments",
+        ]
 
 
 class RateWorkUpdateSerializer(serializers.ModelSerializer):
+    labour = serializers.PrimaryKeyRelatedField(
+        queryset=models.Labour.objects.all(),
+    )
 
     class Meta:
         model = models.RateWork
-        fields = ["name", "quantity", "amount", "id"]
+        fields = [
+            "name",
+            "quantity",
+            "cost_per_unit",
+            "id",
+            "labour",
+            "unit",
+            "is_completed",
+        ]
 
 
 class LabourCreateUpdateSerializer(serializers.ModelSerializer):
@@ -29,7 +80,43 @@ class LabourCreateUpdateSerializer(serializers.ModelSerializer):
             "type",
             "gender",
             "previous_balance",
+            "bank_account_number",
+            "aadhar_number",
+            "ifsc_code",
+            "branch_name",
             "photo",
+        ]
+
+
+class LabourDocumentRetrieveSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.LabourDocument
+        fields = [
+            "id",
+            "document",
+            "file_name",
+        ]
+
+
+class LabourRetrieveSerializer(serializers.ModelSerializer):
+    type = serializers.CharField(source="get_type_display", read_only=True)
+    gender = serializers.CharField(source="get_gender_display", read_only=True)
+    documents = LabourDocumentRetrieveSerializer(many=True)
+
+    class Meta:
+        model = models.Labour
+        fields = [
+            "id",
+            "name",
+            "type",
+            "gender",
+            "aadhar_number",
+            "bank_account_number",
+            "ifsc_code",
+            "branch_name",
+            "photo",
+            "documents",
         ]
 
 
@@ -44,7 +131,6 @@ class LabourSerializer(serializers.ModelSerializer):
             "name",
             "type",
             "gender",
-            "photo",
         ]
 
 
@@ -217,3 +303,38 @@ class WeekLabourUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         fields = "__all__"
         model = models.WeekLabourAssignment
+
+
+class LabourDropdownSerializer(serializers.ModelSerializer):
+    label = serializers.CharField(source="name")
+    value = serializers.CharField(source="id")
+
+    class Meta:
+        model = models.Labour
+        fields = (
+            "label",
+            "value",
+        )
+
+
+class LabourDocumentCreateSerializer(serializers.Serializer):
+    documents = serializers.ListField(
+        child=serializers.FileField(),
+        allow_empty=False,
+    )
+
+    def create(self, validated_data):
+        documents_data = validated_data.get("documents", [])
+        labour = self.context.get("labour")
+
+        document_instances = models.LabourDocument.objects.bulk_create(
+            [
+                models.LabourDocument(
+                    labour=labour,
+                    document=document_file,
+                    file_name=document_file.name,
+                )
+                for document_file in documents_data
+            ]
+        )
+        return document_instances

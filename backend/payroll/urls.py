@@ -64,16 +64,24 @@ weekly_labour_detail = views.WeekLabourAssignmentViewSet.as_view(
 
 urlpatterns = [
     path(
-        "sites/<uuid:site_id>/labours/<uuid:labour_id>/rate-work/",
+        "sites/<uuid:site_id>/rate-work/",
         rate_work_list,
         name="rate-work-list",
     ),
     path(
-        "sites/<uuid:site_id>/labours/<uuid:labour_id>/rate-work/<uuid:pk>/",
+        "sites/<uuid:site_id>/rate-work/<uuid:pk>/",
         rate_work_detail,
         name="rate-work-detail",
     ),
-    path("sites/<uuid:site_id>/labours/", labour_list, name="site-labour-list"),
+    path(
+        "sites/<uuid:site_id>/labours/",
+        labour_list,
+        name="site-labour-list",
+    ),
+    path(
+        "sites/<uuid:site_id>/labours/dropdown/",
+        views.LabourDropdownView.as_view(),
+    ),
     path(
         "sites/<uuid:site_id>/labours/<uuid:pk>/",
         labour_detail,
@@ -89,10 +97,32 @@ urlpatterns = [
         weekly_labour_detail,
         name="weeky-labour-detail",
     ),
-    path("sites/<uuid:site_id>/weeks/", views.WeekListCreateView.as_view()),
-    path("sites/<uuid:site_id>/weeks/<uuid:pk>/", views.WeekRetrieveView.as_view()),
+    path(
+        "rate-work/<uuid:rate_work_id>/payments/",
+        views.RateWorkPaymentCreateView.as_view(),
+    ),
+    path(
+        "rate-work/<uuid:rate_work_id>/payments/<uuid:pk>/",
+        views.RateWorkPaymentDeleteUpdateView.as_view(),
+    ),
+    path(
+        "sites/<uuid:site_id>/weeks/",
+        views.WeekListCreateView.as_view(),
+    ),
+    path(
+        "sites/<uuid:site_id>/weeks/<uuid:pk>/",
+        views.WeekRetrieveView.as_view(),
+    ),
     path(
         "sites/<uuid:site_id>/weeks/<uuid:week_id>/days/<uuid:pk>/",
         views.DailyEntryRetrieveUpdateView.as_view(),
+    ),
+    path(
+        "labours/<uuid:labour_id>/documents/",
+        views.LabourDocumentCreateView.as_view(),
+    ),
+    path(
+        "labours/<uuid:labour_id>/documents/<uuid:pk>/",
+        views.LabourDocumentDeleteView.as_view(),
     ),
 ]
