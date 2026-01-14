@@ -42,7 +42,7 @@ export const ManageSite = () => {
       <div className="max-w-full flex flex-col gap-16">
         <SiteCard setSiteUpdateDialog={setSiteUpdateDialog} site={site} />
         <div>
-          <div className="text-xl font-semibold mb-5">Actions</div>
+          <div className="text-xl font-semibold mb-4">Actions</div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <ItemCard
               title="Mark Attendance"

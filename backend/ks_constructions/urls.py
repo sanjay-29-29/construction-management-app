@@ -30,7 +30,11 @@ urlpatterns = [
                 path("", include("vendors.urls")),
                 path("", include("orders.urls")),
                 path("", include("payroll.urls")),
+                path("", include("labours.urls")),
+                path("", include("rate_work.urls")),
             ]
         ),
     ),
 ]
+
+# urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]

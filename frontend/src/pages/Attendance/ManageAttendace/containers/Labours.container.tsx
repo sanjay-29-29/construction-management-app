@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { Trash2, Loader2, Plus, AlertTriangle } from 'lucide-react';
+import { Trash2, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -16,7 +16,6 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -46,6 +45,7 @@ import {
 } from '@/components/ui/select';
 import { formatNumber } from '@/lib/utils';
 import type { DropdownType, Labour } from '@/types';
+import { useParams } from 'react-router';
 
 const addLabourSchema = z.object({
   labour: z.string('Please select a labour'),
@@ -57,14 +57,11 @@ const addLabourSchema = z.object({
 type AddLabourFormValues = z.infer<typeof addLabourSchema>;
 
 const AddLabourDialog = ({
-  siteId,
-  weekId,
   existingLabours,
 }: {
-  siteId?: string;
-  weekId?: string;
   existingLabours: Labour[];
 }) => {
+  const { siteId, weekId } = useParams();
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -223,13 +220,12 @@ const AddLabourDialog = ({
 
 export const LabourContainer = ({
   data,
-  siteId,
-  weekId,
+  isEditable,
 }: {
   data?: Labour[];
-  siteId?: string;
-  weekId?: string;
+  isEditable?: boolean;
 }) => {
+  const { siteId, weekId } = useParams();
   const queryClient = useQueryClient();
 
   const [labourToDelete, setLabourToDelete] = useState<string | null>(null);
@@ -260,11 +256,7 @@ export const LabourContainer = ({
         <div className="text-xl font-semibold text-gray-900">
           This Week's Labours
         </div>
-        <AddLabourDialog
-          siteId={siteId}
-          weekId={weekId}
-          existingLabours={data || []}
-        />
+        {isEditable && <AddLabourDialog existingLabours={data || []} />}
       </div>
 
       {!data || data.length === 0 ? (
@@ -315,10 +307,6 @@ export const LabourContainer = ({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="flex items-center gap-2 justify-center">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            </div>
             <AlertDialogDescription>
               This will remove the labour from this week's schedule. This action
               cannot be undone.

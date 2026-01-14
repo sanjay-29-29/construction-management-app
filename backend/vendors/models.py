@@ -1,10 +1,10 @@
 import uuid
 from django.db import models
 
-from payroll import models as payroll_models
+from rate_work import models as rate_work_models
 
 
-class VendorPayment(payroll_models.Payment):
+class VendorPayment(rate_work_models.Payment):
     vendor = models.ForeignKey(
         "Vendor",
         on_delete=models.CASCADE,
@@ -20,6 +20,8 @@ class Vendor(models.Model):
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=300)
     notes = models.CharField(max_length=1000, null=True, blank=True)
+    bank_account_number = models.CharField(max_length=24, blank=True)
+    gst_number = models.CharField(max_length=15, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

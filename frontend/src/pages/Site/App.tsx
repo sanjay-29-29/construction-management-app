@@ -4,6 +4,7 @@ import {
   SiteAttendanceHome,
   ManageAttendance,
   ManageDay,
+  PaymentPage,
 } from '@/pages/Attendance';
 import { LabourHome, LabourCreate, ManageLabour } from '@/pages/Labour';
 import { RateWorkHome, ManageRateWork } from '@/pages/RateWork';
@@ -22,6 +23,7 @@ export const App = () => {
         <Route path="weeks">
           <Route index element={<SiteAttendanceHome />} />
           <Route path=":weekId" element={<ManageAttendance />} />
+          <Route path=":weekId/payment" element={<PaymentPage />} />
           <Route path=":weekId/days/:dayId" element={<ManageDay />} />
         </Route>
         <Route path="labours">

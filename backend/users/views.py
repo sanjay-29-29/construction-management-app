@@ -19,6 +19,7 @@ from .models import Roles
 
 class LoginView(views.ObtainAuthToken):
     serializer_class = AuthTokenSerializer
+    permission_classes = []
 
 
 class ObtainBaseInfo(APIView):

@@ -38,7 +38,11 @@ class VendorPaymentDeleteView(viewsets.generics.DestroyAPIView):
 
 class VendorViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.VendorSerializer
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return serializers.VendorRetrieveSerializer
+        return serializers.VendorListSerializer
 
     def get_queryset(self):
         queryset = models.Vendor.objects.all()

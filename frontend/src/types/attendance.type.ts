@@ -17,6 +17,8 @@ export type Labour = {
   ifscCode?: string;
   openingBalance?: number;
   weeklyDailyWage?: number;
+  amountPaid?: number;
+  totalDueToDate?: number;
   documents?: Document[];
 };
 
@@ -24,7 +26,6 @@ export type AttendanceEntry = {
   advanceTaken: number;
   isPresent: boolean;
   labour: string;
-  wageForDay: number;
 };
 
 export type DailyEntry = {
@@ -40,5 +41,18 @@ export type Week = {
   labours?: Labour[];
   dailyEntry?: DailyEntry[];
   startDate: string;
+  payments?: WeekPayment;
   endDate: string;
+  isEditable: boolean;
+};
+
+export type Payment = {
+  labour: string;
+  amountPaid: number;
+};
+
+export type WeekPayment = {
+  id: string;
+  isEditable: boolean;
+  payments: Payment[];
 };

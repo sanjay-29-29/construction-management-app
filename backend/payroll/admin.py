@@ -1,15 +1,11 @@
+from payroll.models import LabourPayment
 from django.contrib import admin
 
 from .models import (
     Week,
     LabourAttendance,
-    Labour,
     DailyEntry,
     WeekLabourAssignment,
-    Payment,
-    RateWork,
-    RatePayment,
-    LabourDocument,
 )
 
 
@@ -23,11 +19,6 @@ class AttendanceAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Labour)
-class LabourAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(DailyEntry)
 class DailyEntryAdmin(admin.ModelAdmin):
     pass
@@ -38,21 +29,6 @@ class WeekLabourAssignmentAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(RateWork)
-class RateWorkAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(RatePayment)
-class RatePaymentAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(LabourDocument)
-class LabourDocumentAdmin(admin.ModelAdmin):
+@admin.register(LabourPayment)
+class LabourPaymentAdmin(admin.ModelAdmin):
     pass

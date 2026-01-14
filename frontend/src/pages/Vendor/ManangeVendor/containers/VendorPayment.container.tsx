@@ -97,7 +97,7 @@ export const VendorPaymentContainer = ({ data }: { data?: Vendor }) => {
   return (
     <>
       <div>
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-4">
           <div className="text-xl font-semibold">Your Payments</div>
           <Button
             variant="outline"

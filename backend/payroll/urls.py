@@ -2,48 +2,6 @@ from django.urls.conf import path
 
 from . import views as views
 
-rate_work_list = views.RateWorkViewSet.as_view(
-    {
-        "get": "list",
-        "post": "create",
-    }
-)
-
-rate_work_detail = views.RateWorkViewSet.as_view(
-    {
-        "get": "retrieve",
-        "put": "update",
-        "patch": "partial_update",
-        "delete": "destroy",
-    }
-)
-
-
-labour_detail = views.LabourViewSet.as_view(
-    {
-        "get": "retrieve",
-        "put": "update",
-        "patch": "partial_update",
-        "delete": "destroy",
-    }
-)
-
-
-labour_list = views.LabourViewSet.as_view(
-    {
-        "get": "list",
-        "post": "create",
-    }
-)
-
-labour_detail = views.LabourViewSet.as_view(
-    {
-        "get": "retrieve",
-        "put": "update",
-        "patch": "partial_update",
-        "delete": "destroy",
-    }
-)
 
 weekly_labour_list = views.WeekLabourAssignmentViewSet.as_view(
     {
@@ -61,31 +19,41 @@ weekly_labour_detail = views.WeekLabourAssignmentViewSet.as_view(
     }
 )
 
+week_list = views.WeekViewSet.as_view(
+    {
+        "get": "list",
+        "post": "create",
+    }
+)
+
+week_detail = views.WeekViewSet.as_view(
+    {
+        "get": "retrieve",
+        "put": "update",
+        "patch": "partial_update",
+        "delete": "destroy",
+    }
+)
+
 
 urlpatterns = [
     path(
-        "sites/<uuid:site_id>/rate-work/",
-        rate_work_list,
-        name="rate-work-list",
+        "weeks/<uuid:week_id>/payment/",
+        views.WeekPaymentListSerializer.as_view(),
     ),
     path(
-        "sites/<uuid:site_id>/rate-work/<uuid:pk>/",
-        rate_work_detail,
-        name="rate-work-detail",
+        "sites/<uuid:site_id>/weeks/",
+        week_list,
+        name="week-list",
     ),
     path(
-        "sites/<uuid:site_id>/labours/",
-        labour_list,
-        name="site-labour-list",
+        "sites/<uuid:site_id>/weeks/<uuid:pk>/",
+        week_detail,
+        name="weeky-detail",
     ),
     path(
-        "sites/<uuid:site_id>/labours/dropdown/",
-        views.LabourDropdownView.as_view(),
-    ),
-    path(
-        "sites/<uuid:site_id>/labours/<uuid:pk>/",
-        labour_detail,
-        name="site-labour-detail",
+        "sites/<uuid:site_id>/weeks/<uuid:week_id>/days/<uuid:pk>/",
+        views.DailyEntryRetrieveUpdateView.as_view(),
     ),
     path(
         "sites/<uuid:site_id>/weeks/<uuid:week_id>/labours/",
@@ -96,33 +64,5 @@ urlpatterns = [
         "sites/<uuid:site_id>/weeks/<uuid:week_id>/labours/<uuid:pk>/",
         weekly_labour_detail,
         name="weeky-labour-detail",
-    ),
-    path(
-        "rate-work/<uuid:rate_work_id>/payments/",
-        views.RateWorkPaymentCreateView.as_view(),
-    ),
-    path(
-        "rate-work/<uuid:rate_work_id>/payments/<uuid:pk>/",
-        views.RateWorkPaymentDeleteUpdateView.as_view(),
-    ),
-    path(
-        "sites/<uuid:site_id>/weeks/",
-        views.WeekListCreateView.as_view(),
-    ),
-    path(
-        "sites/<uuid:site_id>/weeks/<uuid:pk>/",
-        views.WeekRetrieveView.as_view(),
-    ),
-    path(
-        "sites/<uuid:site_id>/weeks/<uuid:week_id>/days/<uuid:pk>/",
-        views.DailyEntryRetrieveUpdateView.as_view(),
-    ),
-    path(
-        "labours/<uuid:labour_id>/documents/",
-        views.LabourDocumentCreateView.as_view(),
-    ),
-    path(
-        "labours/<uuid:labour_id>/documents/<uuid:pk>/",
-        views.LabourDocumentDeleteView.as_view(),
     ),
 ]

@@ -52,7 +52,7 @@ export function LoginPage() {
     try {
       const response = await client.post('login/', {
         ...data,
-        fcm_token: tokenValue,
+        fcmToken: tokenValue,
       });
       await Preferences.set({
         key: 'token',
@@ -86,7 +86,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-dvh w-full bg-background flex flex-col">
+    <div className="min-h-dvh w-full bg-background flex flex-col max-w-7xl mx-auto">
       <main className="flex-1 flex flex-col justify-center px-6 sm:px-8 pb-12">
         <div className="mb-8 text-center sm:text-left">
           <h1 className="text-3xl tracking-tight text-foreground">

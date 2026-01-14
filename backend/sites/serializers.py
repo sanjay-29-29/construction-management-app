@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.db import transaction
 import rest_framework.serializers as serializers
 
 from users.serializers import UserSerializer
@@ -20,8 +20,8 @@ class RetrieveSiteSerializer(ListSiteSerializer):
 
 
 class CreateSiteSerializer(serializers.ModelSerializer):
-    supervisors = serializers.PrimaryKeyRelatedField(
-        queryset=get_user_model().objects.all(), many=True, required=False
+    supervisors = serializers.ListField(
+        child=serializers.UUIDField(), write_only=True, required=False
     )
 
     class Meta:
@@ -34,27 +34,34 @@ class CreateSiteSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        supervisors = validated_data.pop("supervisors", [])
-        site = Site.objects.create(**validated_data)
+        supervisor_ids = validated_data.pop("supervisors", [])
 
-        SiteSupervisor.objects.bulk_create(
-            [SiteSupervisor(site=site, user=s) for s in supervisors]
-        )
+        with transaction.atomic():
+            site = Site.objects.create(**validated_data)
+
+            if supervisor_ids:
+                SiteSupervisor.objects.bulk_create(
+                    [SiteSupervisor(site=site, user_id=s_id) for s_id in supervisor_ids]
+                )
+
         return site
 
     def update(self, instance, validated_data):
-        supervisors = validated_data.pop("supervisors", None)
+        supervisors_ids = validated_data.pop("supervisors", None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        instance.save()
 
-        if supervisors is not None:
-            SiteSupervisor.objects.filter(site=instance).delete()
-
+        if supervisors_ids is not None:
+            instance.sitesupervisor_set.all().delete()
             SiteSupervisor.objects.bulk_create(
-                [SiteSupervisor(site=instance, user=user) for user in supervisors]
+                [
+                    SiteSupervisor(site=instance, user_id=s_id)
+                    for s_id in supervisors_ids
+                ]
             )
+
+        instance.save()
 
         return instance
 

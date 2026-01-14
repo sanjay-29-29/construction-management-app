@@ -20,11 +20,14 @@ from .serializers import (
 
 
 class OrderViewSet(ModelViewSet):
-    queryset = (
-        Order.objects.all()
-        .select_related("site", "vendor")
-        .prefetch_related("materials", "images")
-    )
+    def get_queryset(self):
+        queryset = Order.objects.all()
+        if self.action in ["destroy", "update", "partial_update"]:
+            return queryset
+        if self.action == "retrieve":
+            return queryset.prefetch_related("materials", "images").select_related(
+                "site", "vendor", "completed_by"
+            )
 
     def get_serializer_class(self):
         if self.action == "list" or self.action == "retrieve":
@@ -36,9 +39,7 @@ class ListOrder(generics.ListAPIView):
     serializer_class = OrderListSerializer
 
     def get_queryset(self):
-        queryset = Order.objects.select_related("site", "vendor").prefetch_related(
-            "materials"
-        )
+        queryset = Order.objects.select_related("site", "vendor")
 
         # -----------------------------
         # AG-GRID FILTERING

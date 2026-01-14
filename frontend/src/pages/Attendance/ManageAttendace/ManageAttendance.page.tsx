@@ -5,7 +5,7 @@ import { client } from '@/axios';
 import { LoaderPage } from '@/components/LoaderPage';
 import { Scaffold } from '@/components/Scaffold';
 import { formatDate } from '@/lib/utils';
-import type { Labour, Week } from '@/types';
+import type { Week } from '@/types';
 
 import { AttendanceGrid } from './containers/AttendanceGrid.container';
 import { LabourContainer } from './containers/Labours.container';
@@ -27,35 +27,22 @@ export const ManageAttendance = () => {
     },
   });
 
-  const {
-    data,
-    isLoading,
-    isError: labourIsError,
-  } = useQuery({
-    queryKey: ['sites', siteId, 'weeks', weekId, 'labours'],
-    queryFn: async () => {
-      const response = await client.get<Labour[]>(
-        `sites/${siteId}/weeks/${weekId}/labours/`
-      );
-      return response.data;
-    },
-  });
-
-  if (attendanceIsError || labourIsError)
-    return <Navigate to="/sites" replace />;
-
-  if (
-    (!attendanceIsError && attendanceIsLoading) ||
-    (!labourIsError && isLoading)
-  ) {
+  if (attendanceIsLoading) {
     return <LoaderPage />;
+  }
+
+  if (attendanceIsError) {
+    return <Navigate to="/sites" replace />;
   }
 
   return (
     <Scaffold title={`Week of ${formatDate(attendanceData?.startDate)}`}>
       <div className="flex flex-col h-full gap-16">
         <AttendanceGrid data={attendanceData} />
-        <LabourContainer data={data} siteId={siteId} weekId={weekId} />
+        <LabourContainer
+          data={attendanceData?.labours}
+          isEditable={attendanceData?.isEditable}
+        />
       </div>
     </Scaffold>
   );

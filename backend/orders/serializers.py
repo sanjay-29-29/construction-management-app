@@ -219,24 +219,3 @@ class OrderRetrieveSerializer(serializers.ModelSerializer):
             "paid",
             "number",
         ]
-
-
-# class OrderUpdateSerializer(serializers.ModelSerializer):
-#
-#     materials = OrderMaterialSerializer(many=True, required=False)
-#
-#     class Meta:
-#         model = Order
-#         fields = [
-#             "name",
-#             "site",
-#             "materials",
-#             "remarks",
-#             "is_completed",
-#             "paid",
-#             "number",
-#         ]
-#         extra_kwargs = {
-#             "name": {"required": False},
-#             "site": {"required": False},
-#         }

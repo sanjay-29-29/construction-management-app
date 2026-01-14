@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "django_probes",
     "django_cleanup.apps.CleanupConfig",
     "phonenumber_field",
+    # "silk",
     "corsheaders",
     "storages",
     "fcm_django",
@@ -67,12 +68,15 @@ INSTALLED_APPS = [
     "vendors",
     "orders",
     "payroll",
+    "rate_work",
+    "labours",
 ]
 
 
 AUTH_USER_MODEL = "users.CustomUser"
 
 MIDDLEWARE = [
+    # "silk.middleware.SilkyMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -83,7 +87,22 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
+TEMPLATES = [
+    {
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+            ],
+        },
+    }
+]
+
+
 REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ],

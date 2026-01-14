@@ -109,78 +109,73 @@ export const LabourCreate = () => {
       <div className="p-4 pb-20 bg-white flex-1 lg:flex-initial lg:m-8 lg:p-4 lg:rounded-md">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5">
-            <div className="grid grid-cols-2 gap-5">
-              <div className="flex items-center gap-5">
-                <Avatar className="h-16 w-16 relative">
-                  <AvatarImage
-                    src={photoPreviewUrl ?? undefined}
-                    alt="@shadcn"
-                  />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <FormField
-                  control={form.control}
-                  name="photo"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Photo</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={undefined}
-                          type="file"
-                          accept="image/*"
-                          ref={fileInputRef}
-                          disabled={mutation.isPending}
-                          onChange={(e) => {
-                            field.onChange(e.target.files?.[0] ?? null);
-                          }}
-                          endContent={
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              disabled={mutation.isPending}
-                              onClick={() => {
-                                form.setValue('photo', undefined);
-                                if (fileInputRef.current) {
-                                  fileInputRef.current.value = '';
-                                }
-                              }}
-                              className="shrink-0"
-                            >
-                              <X className="mr-1 h-4 w-4" />
-                            </Button>
-                          }
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Upload labour photo (JPG, PNG)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            <div className="flex items-center gap-5">
+              <Avatar className="h-16 w-16 relative">
+                <AvatarImage src={photoPreviewUrl ?? undefined} alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
               <FormField
                 control={form.control}
-                name="name"
+                name="photo"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
+                  <FormItem className="flex-1">
+                    <FormLabel>Photo</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="John"
-                        disabled={mutation.isPending}
                         {...field}
+                        value={undefined}
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        disabled={mutation.isPending}
+                        onChange={(e) => {
+                          field.onChange(e.target.files?.[0] ?? null);
+                        }}
+                        endContent={
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            disabled={mutation.isPending}
+                            onClick={() => {
+                              form.setValue('photo', undefined);
+                              if (fileInputRef.current) {
+                                fileInputRef.current.value = '';
+                              }
+                            }}
+                            className="shrink-0"
+                          >
+                            <X className="mr-1 h-4 w-4" />
+                          </Button>
+                        }
                       />
                     </FormControl>
-                    <FormDescription>Enter name of the labour</FormDescription>
+                    <FormDescription>
+                      Upload labour photo (JPG, PNG)
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="John"
+                      disabled={mutation.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>Enter name of the labour</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="previousBalance"
@@ -336,7 +331,6 @@ export const LabourCreate = () => {
                 </FormItem>
               )}
             />
-
             <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t px-4 py-3 lg:static lg:mt-6 lg:flex lg:justify-end lg:bg-transparent lg:border-none lg:p-0">
               <Button className="w-full h-12 text-base font-medium lg:w-auto lg:h-auto">
                 {mutation.isPending ? (

@@ -169,7 +169,7 @@ export const VendorMaterialGrid = ({ vendor }: { vendor?: Vendor }) => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-4">
         <div className="text-xl font-semibold">Your Orders</div>
         <Link to="order">
           <Button variant="outline">

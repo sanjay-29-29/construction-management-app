@@ -160,7 +160,7 @@ export const UpdateLabourDialog = ({
                     src={photoPreviewUrl ?? undefined}
                     alt="@shadcn"
                   />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarFallback></AvatarFallback>
                 </Avatar>
                 <FormField
                   control={form.control}

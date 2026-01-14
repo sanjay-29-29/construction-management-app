@@ -32,7 +32,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ROLES } from '@/constants/role.constants';
 import { useAuth } from '@/context/Auth';
 import type { Labour } from '@/types';
 
@@ -44,7 +43,7 @@ export const LabourCard = ({
   setLabourUpdateDialog: Dispatch<SetStateAction<boolean>>;
 }) => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { isHeadOffice } = useAuth();
   const navigate = useNavigate();
   const { siteId } = useParams();
   const [labourToDelete, setLabourToDelete] = useState<string | null>(null);
@@ -87,7 +86,9 @@ export const LabourCard = ({
                   src={data?.photo ?? undefined}
                   alt="labour photo"
                 />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>
+                  {data?.name.slice(0, 1).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <CardTitle className="text-lg sm:text-xl truncate grid">
                 {data?.name}
@@ -132,7 +133,7 @@ export const LabourCard = ({
                 <span className="font-medium text-muted-foreground">
                   {data?.branchName ?? '—'}
                 </span>
-              </div>{' '}
+              </div>
             </CardDescription>
           </div>
 
@@ -144,8 +145,7 @@ export const LabourCard = ({
           >
             <Edit className="h-4 w-4" />
           </Button>
-          {(user?.role === ROLES.ADMIN ||
-            user?.role === ROLES.SITE_ENGINEER) && (
+          {isHeadOffice && (
             <Button
               variant="outline"
               size="icon"
