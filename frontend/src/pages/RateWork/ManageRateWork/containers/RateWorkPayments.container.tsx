@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -13,7 +13,6 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/Auth';
@@ -34,7 +33,7 @@ export const RateWorkPayments = ({ data }: { data?: RateWork }) => {
       await client.delete(`rate-work/${rateWorkId}/payments/${id}/`);
     },
     onSuccess: () => {
-      toast.success('Labour removed successfully');
+      toast.success('Payment entry removed successfully');
       queryClient.invalidateQueries({
         queryKey: ['sites', siteId, 'rate-work', rateWorkId],
       });
@@ -103,10 +102,6 @@ export const RateWorkPayments = ({ data }: { data?: RateWork }) => {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <div className="flex items-center gap-2 justify-center">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              </div>
               <AlertDialogDescription>
                 This will remove the payment. This action cannot be undone.
               </AlertDialogDescription>

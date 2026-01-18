@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { isAxiosError } from 'axios';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -14,8 +14,16 @@ import { LoaderPage } from '@/components/LoaderPage';
 import { Scaffold } from '@/components/Scaffold';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Form, FormField } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { PAYMENT_DROPDOWN } from '@/constants';
 import { cn, formatDate } from '@/lib/utils';
 import type { AttendanceEntry, DailyEntry, Labour } from '@/types';
 
@@ -28,6 +36,7 @@ const attendanceRowSchema = z.object({
   advanceTaken: z.coerce
     .number<number>()
     .nonnegative('Advance cannot be negative'),
+  paymentType: z.number(),
 });
 
 const formSchema = z.object({
@@ -73,8 +82,9 @@ export const ManageDay = () => {
           labour: labour.id,
           name: labour.name,
           gender: labour.gender,
-          isPresent: record ? record.isPresent : false,
-          advanceTaken: record ? record.advanceTaken : 0,
+          isPresent: record?.isPresent ?? false,
+          advanceTaken: record?.advanceTaken ?? 0,
+          paymentType: record?.paymentType ?? 1,
         };
       });
 
@@ -83,83 +93,10 @@ export const ManageDay = () => {
     []
   );
 
-  useEffect(() => {
-    if (data) {
-      reset(transformDataForForm(data));
-    }
-  }, [data, reset, transformDataForForm]);
-
-  const columnDefs: ColDef[] = [
-    {
-      field: 'name',
-      headerName: 'Labour Name',
-      pinned: 'left',
-      width: 250,
-    },
-    {
-      field: 'gender',
-      headerName: 'Gender',
-      width: 100,
-    },
-    {
-      headerName: 'Present',
-      width: 100,
-      cellRenderer: (params: ICellRendererParams) => {
-        const rowIndex = params.node.rowIndex;
-        if (rowIndex == null) return;
-
-        return (
-          <FormField
-            control={form.control}
-            name={`rows.${rowIndex}.isPresent`}
-            render={({ field }) => (
-              <div className="flex justify-center w-full">
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </div>
-            )}
-          />
-        );
-      },
-    },
-    {
-      headerName: 'Advance',
-      minWidth: 140,
-      flex: 1,
-      cellRenderer: (params: ICellRendererParams) => {
-        const rowIndex = params.node.rowIndex;
-        if (rowIndex == null) return;
-
-        return (
-          <FormField
-            control={form.control}
-            name={`rows.${rowIndex}.advanceTaken`}
-            render={({ field, fieldState }) => (
-              <Input
-                {...field}
-                startContent={'₹'}
-                type="number"
-                className={cn(
-                  'h-9',
-                  fieldState.error &&
-                    'border-red-500 focus-visible:ring-red-500'
-                )}
-              />
-            )}
-          />
-        );
-      },
-    },
-  ];
-
   const mutation = useMutation({
     mutationFn: async (values: AttendanceFormData) => {
       const attendances = values.rows.map((row) => ({
-        labour: row.labour,
-        isPresent: row.isPresent,
-        advanceTaken: row.advanceTaken,
+        ...row,
       }));
       await client.patch(`sites/${siteId}/weeks/${weekId}/days/${dayId}/`, {
         attendances,
@@ -183,11 +120,119 @@ export const ManageDay = () => {
 
   const handleSubmit = (data: AttendanceFormData) => mutation.mutate(data);
 
+  const columnDefs: ColDef[] = useMemo(
+    () => [
+      {
+        field: 'name',
+        headerName: 'Labour Name',
+        pinned: 'left',
+        width: 250,
+      },
+      {
+        field: 'gender',
+        headerName: 'Gender',
+        width: 100,
+      },
+      {
+        headerName: 'Present',
+        width: 100,
+        cellRenderer: (params: ICellRendererParams) => {
+          const rowIndex = params.node.rowIndex;
+          if (rowIndex == null) return;
+
+          return (
+            <FormField
+              control={form.control}
+              name={`rows.${rowIndex}.isPresent`}
+              render={({ field }) => (
+                <div className="flex justify-center w-full">
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </div>
+              )}
+            />
+          );
+        },
+      },
+      {
+        headerName: 'Advance',
+        minWidth: 140,
+        flex: 1,
+        cellRenderer: (params: ICellRendererParams) => {
+          const rowIndex = params.node.rowIndex;
+          if (rowIndex == null) return;
+
+          return (
+            <FormField
+              control={form.control}
+              name={`rows.${rowIndex}.advanceTaken`}
+              render={({ field, fieldState }) => (
+                <Input
+                  {...field}
+                  startContent={'₹'}
+                  type="number"
+                  className={cn(
+                    'h-9',
+                    fieldState.error &&
+                      'border-red-500 focus-visible:ring-red-500'
+                  )}
+                />
+              )}
+            />
+          );
+        },
+      },
+      {
+        headerName: 'Payment Type',
+        cellClass: 'flex items-center justify-center',
+        cellRenderer: (params: ICellRendererParams) => {
+          const rowIndex = params.node.rowIndex;
+          if (rowIndex == null) return;
+
+          return (
+            <FormField
+              control={form.control}
+              name={`rows.${rowIndex}.paymentType`}
+              render={({ field }) => (
+                <FormItem>
+                  <Select
+                    onValueChange={(val) => field.onChange(Number(val))}
+                    defaultValue={String(field.value)}
+                    disabled={mutation.isPending}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="h-9 w-full truncate">
+                        <SelectValue placeholder="Select Payment Type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {PAYMENT_DROPDOWN.map((val) => (
+                        <SelectItem value={val.value} key={val.value}>
+                          {val.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+          );
+        },
+      },
+    ],
+    [form.control, mutation.isPending]
+  );
+
   useEffect(() => {
-    if (data && data.isEditable === false) {
-      navigate(`/sites/${siteId}/weeks/${weekId}`, { replace: true });
+    if (data) {
+      reset(transformDataForForm(data));
+      if (data.isEditable === false) {
+        navigate(`/sites/${siteId}/weeks/${weekId}`, { replace: true });
+      }
     }
-  }, [data, siteId, weekId, navigate]);
+  }, [data, siteId, weekId, navigate, reset, transformDataForForm]);
 
   if (isLoading) {
     return <LoaderPage />;

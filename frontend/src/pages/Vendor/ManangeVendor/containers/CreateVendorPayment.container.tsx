@@ -104,11 +104,12 @@ export const CreateVendorPayment = ({
                     <FormLabel>Amount Paid</FormLabel>
                     <FormControl>
                       <Input
+                        startContent={'₹'}
                         type="number"
                         step="0.01"
                         placeholder="Amount Paid"
-                        {...field}
                         disabled={mutation.isPending}
+                        {...field}
                       />
                     </FormControl>
                     <FormDescription>Enter amount paid</FormDescription>

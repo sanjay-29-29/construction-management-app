@@ -20,11 +20,13 @@ export type Labour = {
   amountPaid?: number;
   totalDueToDate?: number;
   panNumber?: string;
+  paymentType?: number;
   documents?: Document[];
 };
 
 export type AttendanceEntry = {
   advanceTaken: number;
+  paymentType?: number;
   isPresent: boolean;
   labour: string;
 };

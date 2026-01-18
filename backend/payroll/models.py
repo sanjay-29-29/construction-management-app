@@ -8,6 +8,11 @@ from labours import models as labours_models
 from sites import models as sites_models
 
 
+class PaymentType(models.IntegerChoices):
+    BANK_TRANSFER = 1, "Bank Transfer"
+    CASH = 2, "Cash"
+
+
 class DailyEntry(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -124,6 +129,11 @@ class LabourPayment(models.Model):
         decimal_places=2,
         default=0,
     )
+    payment_type = models.IntegerField(
+        choices=PaymentType,
+        default=PaymentType.BANK_TRANSFER,
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.labour} {self.amount_paid}"
@@ -143,6 +153,12 @@ class LabourAttendance(models.Model):
     )
 
     is_present = models.BooleanField(default=False)
+
+    payment_type = models.IntegerField(
+        choices=PaymentType,
+        default=PaymentType.BANK_TRANSFER,
+        blank=True,
+    )
 
     advance_taken = models.DecimalField(
         max_digits=10,

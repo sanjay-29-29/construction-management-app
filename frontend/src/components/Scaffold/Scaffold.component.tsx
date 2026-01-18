@@ -1,10 +1,8 @@
 import { ArrowLeft, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 
+import logo from '@/assets/logo.jpeg';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useAuth } from '@/context/Auth';
-import { cn } from '@/lib/utils';
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +10,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/context/Auth';
+import { cn } from '@/lib/utils';
 
 import type { ScaffoldType } from './Scaffold.type';
 
@@ -36,11 +36,8 @@ export const Scaffold = ({ children, title, disablePadding }: ScaffoldType) => {
             </button>
 
             {/* Desktop Logo/Brand */}
-            <div className="hidden lg:flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">YA</span>
-              </div>
-              <span className="text-xl font-semibold">KS Construction</span>
+            <div className="hidden lg:block w-36">
+              <img src={logo} />
             </div>
 
             {/* Title */}

@@ -22,9 +22,19 @@ export const LABOUR_DROPDOWN = [
 export const GENDER = {
   MALE: 'Male',
   FEMALE: 'Female',
-};
+} as const;
 
 export const GENDER_DROPDOWN = [
   { value: '1', label: 'Male' },
   { value: '2', label: 'Female' },
 ] as const;
+
+export const PAYMENT_DROPDOWN = [
+  { value: '1', label: 'Bank Transfer' },
+  { value: '2', label: 'Cash' },
+] as const;
+
+export const PAYMENT_TYPE = {
+  BANK_TRANSFER: 1,
+  CASH: 2,
+} as const;

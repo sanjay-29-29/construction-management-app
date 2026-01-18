@@ -1,12 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { isAxiosError } from 'axios';
-import { PlusIcon } from 'lucide-react';
-import { useState } from 'react';
+import { Loader2, PlusIcon } from 'lucide-react';
+import { useState, type FormEvent } from 'react';
 import { useParams } from 'react-router';
 import { toast } from 'sonner';
 
 import { client } from '@/axios';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { formatDate, formatNumber } from '@/lib/utils';
 import type { Payment, Vendor } from '@/types';
@@ -19,6 +28,7 @@ export const VendorPaymentContainer = ({ data }: { data?: Vendor }) => {
   const { vendorId } = useParams();
   const queryClient = useQueryClient();
   const [dialogState, setDialogState] = useState(false);
+  const [paymentToDelete, setPaymentToDelete] = useState<string | null>(null);
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
@@ -29,6 +39,7 @@ export const VendorPaymentContainer = ({ data }: { data?: Vendor }) => {
       queryClient.invalidateQueries({
         queryKey: ['vendors', vendorId],
       });
+      setPaymentToDelete(null);
     },
     onError: (error) => {
       if (isAxiosError(error)) {
@@ -71,7 +82,7 @@ export const VendorPaymentContainer = ({ data }: { data?: Vendor }) => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => mutation.mutate(id ?? '')}
+              onClick={() => setPaymentToDelete(id ?? null)}
               className="h-9 text-destructive hover:text-destructive hover:bg-destructive/10"
             >
               Remove
@@ -124,6 +135,42 @@ export const VendorPaymentContainer = ({ data }: { data?: Vendor }) => {
         dialogOpen={dialogState}
         setDialogOpen={setDialogState}
       />
+      <AlertDialog
+        open={!!paymentToDelete}
+        onOpenChange={(open) => !open && setPaymentToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogDescription>
+              Are you sure you want to delete this payment entry? This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={mutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={mutation.isPending}
+              type="button"
+              onClick={(e: FormEvent<HTMLButtonElement>) => {
+                e.preventDefault();
+                mutation.mutate(paymentToDelete ?? '');
+              }}
+            >
+              {mutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

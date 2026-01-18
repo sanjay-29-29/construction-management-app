@@ -18,6 +18,7 @@ class LabourAttendanceRetrieveSerializer(serializers.ModelSerializer):
             "labour",
             "is_present",
             "advance_taken",
+            "payment_type",
         ]
 
 
@@ -25,6 +26,7 @@ class WeekLabourRetrieveSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source="labour.id", read_only=True)
     name = serializers.CharField(source="labour.name")
     amount_paid = serializers.FloatField(source="week_payment.amount_paid")
+    payment_type = serializers.IntegerField(source="week_payment.payment_type")
     weekly_daily_wage = serializers.FloatField()
     opening_balance = serializers.FloatField(read_only=True)
     total_due_to_date = serializers.FloatField(read_only=True)
@@ -40,6 +42,7 @@ class WeekLabourRetrieveSerializer(serializers.ModelSerializer):
             "opening_balance",
             "type",
             "week_link_id",
+            "payment_type",
             "gender",
             "total_due_to_date",
             "amount_paid",
@@ -87,7 +90,7 @@ class LabourPaymentCreateSerailizer(serializers.ModelSerializer):
 
     class Meta:
         model = models.LabourPayment
-        fields = ["labour", "amount_paid"]
+        fields = ["labour", "amount_paid", "payment_type"]
 
 
 class WeekCreateUpdateSerializer(serializers.ModelSerializer):
@@ -130,6 +133,7 @@ class WeekCreateUpdateSerializer(serializers.ModelSerializer):
                         models.LabourPayment(
                             amount_paid=payment["amount_paid"],
                             labour_id=payment["labour"],
+                            payment_type=payment["payment_type"],
                         )
                         for payment in payments_data
                     ]
@@ -138,16 +142,6 @@ class WeekCreateUpdateSerializer(serializers.ModelSerializer):
             instance.save()
 
         return instance
-
-
-class LabourPaymentRetrieveSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = [
-            "id",
-            "amount_paid",
-        ]
-        model = models.LabourPayment
 
 
 class WeekRetrieveSerializer(serializers.ModelSerializer):
@@ -338,6 +332,7 @@ class LabourAttendanceUpdateSerializer(serializers.ModelSerializer):
             "labour",
             "is_present",
             "advance_taken",
+            "payment_type",
         ]
 
 
@@ -368,6 +363,7 @@ class DailyEntryUpdateSerializer(serializers.ModelSerializer):
                     [
                         models.LabourAttendance(
                             daily_entry=instance,
+                            payment_type=item["payment_type"],
                             labour_id=item["labour"],
                             is_present=item["is_present"],
                             advance_taken=item["advance_taken"],

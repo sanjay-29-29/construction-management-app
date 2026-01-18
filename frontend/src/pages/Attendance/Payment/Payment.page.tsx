@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
-import { Form, FormField } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { cn, formatNumber } from '@/lib/utils';
 import { AgGridReact } from 'ag-grid-react';
@@ -18,6 +18,14 @@ import { LoaderPage } from '@/components/LoaderPage';
 import { isAxiosError } from 'axios';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { PAYMENT_DROPDOWN } from '@/constants';
 
 const weekPaymentFormSchema = z.object({
   payments: z.array(
@@ -26,6 +34,7 @@ const weekPaymentFormSchema = z.object({
       amountPaid: z.coerce
         .number<number>()
         .nonnegative('Amount paid cannot be negative'),
+      paymentType: z.number(),
     })
   ),
 });
@@ -122,6 +131,43 @@ export const PaymentPage = () => {
         );
       },
     },
+    {
+      headerName: 'Payment Type',
+      cellClass: 'flex items-center justify-center',
+      cellRenderer: (params: ICellRendererParams) => {
+        const rowIndex = params.node.rowIndex;
+        if (rowIndex == null) return;
+
+        return (
+          <FormField
+            control={form.control}
+            name={`payments.${rowIndex}.paymentType`}
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={(val) => field.onChange(Number(val))}
+                  defaultValue={String(field.value)}
+                  disabled={mutation.isPending}
+                >
+                  <FormControl>
+                    <SelectTrigger className="h-9 w-full truncate">
+                      <SelectValue placeholder="Select Payment Type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {PAYMENT_DROPDOWN.map((val) => (
+                      <SelectItem value={val.value} key={val.value}>
+                        {val.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+        );
+      },
+    },
   ];
 
   const { reset } = form;
@@ -134,6 +180,7 @@ export const PaymentPage = () => {
         gender: val.gender,
         totalDueToPay: val.totalDueToDate ?? 0,
         amountPaid: val.amountPaid ?? 0,
+        paymentType: val.paymentType ?? 1,
       })),
     [data]
   );

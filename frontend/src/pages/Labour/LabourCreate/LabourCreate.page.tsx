@@ -327,7 +327,7 @@ export const LabourCreate = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>Enter bank account number</FormDescription>
+                  <FormDescription>Enter IFSC code</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

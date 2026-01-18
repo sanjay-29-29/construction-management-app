@@ -68,7 +68,7 @@ const multiSelectVariants = cva('m-1 transition-all duration-300 ease-in-out', {
   },
   defaultVariants: {
     variant: 'default',
-    badgeAnimation: 'bounce',
+    badgeAnimation: 'none',
   },
 });
 

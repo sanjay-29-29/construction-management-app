@@ -279,7 +279,7 @@ export const UpdateLabourDialog = ({
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>Enter name aadhar number</FormDescription>
+                    <FormDescription>Enter AADHAR number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -315,9 +315,7 @@ export const UpdateLabourDialog = ({
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      Enter name bank account number
-                    </FormDescription>
+                    <FormDescription>Enter bank account number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -335,9 +333,7 @@ export const UpdateLabourDialog = ({
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      Enter name bank account number
-                    </FormDescription>
+                    <FormDescription>Enter IFSC code</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -18,6 +18,7 @@ import { formatDate, formatNumber } from '@/lib/utils';
 import type { AttendanceEntry, Labour, Week } from '@/types';
 
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
+import { PAYMENT_TYPE } from '@/constants';
 
 type AttendanceGridRow = Labour & {
   [key: string]: AttendanceEntry | string | number | null | undefined;
@@ -89,6 +90,7 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
         amountPaid: labour.amountPaid,
         openingBalance: labour.openingBalance,
         totalDueToDate: labour.totalDueToDate,
+        paymentType: labour.paymentType,
       };
 
       let weeklyTotal = 0;
@@ -274,7 +276,7 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
                   {val.advanceTaken > 0 ? (
                     <div className="flex-1 flex flex-col justify-center items-center border-r border-slate-200 font-semibold bg-amber-50 text-amber-400">
                       <span className="text-xs font-semibold text-amber-700">
-                        ₹ {formatNumber(val.advanceTaken)}
+                        {`₹ ${formatNumber(val.advanceTaken)} (${val.paymentType === PAYMENT_TYPE.CASH ? 'C' : 'B'})`}
                       </span>
                     </div>
                   ) : (
@@ -290,11 +292,13 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
             return (
               <div className="w-full h-full flex items-center justify-center gap-1.5 opacity-60 bg-red-100">
                 {val.advanceTaken > 0 ? (
-                  <div className="text-xs font-semibold text-red-400">
-                    ₹ {formatNumber(val.advanceTaken)}
+                  <div className="text-xs font-semibold text-red-600">
+                    {`₹ ${formatNumber(val.advanceTaken)} (${val.paymentType === PAYMENT_TYPE.CASH ? 'C' : 'B'})`}
                   </div>
                 ) : (
-                  <span className="text-red-600 text-xs ">Absent</span>
+                  <span className="text-red-600 text-xs font-semibold">
+                    Absent
+                  </span>
                 )}
               </div>
             );
@@ -374,13 +378,16 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
             </div>
           );
         },
-
         cellRenderer: (params: ICellRendererParams) => {
-          if (params.node.isRowPinned()) return null;
-          const val = params.value || 0;
+          const rowData = params.data;
+
+          if (params.node.isRowPinned() || !rowData) return null;
+          const pType = rowData.paymentType;
+          const typeLabel = pType === PAYMENT_TYPE.CASH ? 'C' : 'B';
+
           return (
             <span className="w-full text-center font-semibold">
-              ₹ {formatNumber(val)}
+              {`₹ ${formatNumber(params.value)} (${typeLabel})`}
             </span>
           );
         },
@@ -393,7 +400,6 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
           'bg-violet-50 font-semibold flex items-center justify-center',
         valueFormatter: (params) => `₹ ${formatNumber(params.value)}`,
       },
-
       {
         field: 'weeklyTotal',
         headerName: 'Total Paid',
