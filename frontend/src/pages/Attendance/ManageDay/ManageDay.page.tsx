@@ -25,7 +25,9 @@ const attendanceRowSchema = z.object({
   labour: z.string().min(1, 'Labour ID is required'),
   name: z.string().min(1, 'Name is required'),
   isPresent: z.boolean(),
-  advanceTaken: z.number().nonnegative('Advance cannot be negative'),
+  advanceTaken: z.coerce
+    .number<number>()
+    .nonnegative('Advance cannot be negative'),
 });
 
 const formSchema = z.object({
@@ -47,12 +49,16 @@ export const ManageDay = () => {
       );
       return response.data;
     },
+    gcTime: 0,
+    staleTime: 0,
   });
 
   const form = useForm<AttendanceFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: { rows: [] },
   });
+
+  const { reset } = form;
 
   const transformDataForForm = useCallback(
     (apiData: DailyEntry): AttendanceFormData => {
@@ -79,9 +85,9 @@ export const ManageDay = () => {
 
   useEffect(() => {
     if (data) {
-      form.reset(transformDataForForm(data));
+      reset(transformDataForForm(data));
     }
-  }, [data, form, transformDataForForm]);
+  }, [data, reset, transformDataForForm]);
 
   const columnDefs: ColDef[] = [
     {
@@ -110,12 +116,7 @@ export const ManageDay = () => {
               <div className="flex justify-center w-full">
                 <Checkbox
                   checked={field.value}
-                  onCheckedChange={(val) => {
-                    field.onChange(val);
-                    if (!val) {
-                      form.setValue(`rows.${rowIndex}.advanceTaken`, 0);
-                    }
-                  }}
+                  onCheckedChange={field.onChange}
                 />
               </div>
             )}
@@ -135,27 +136,18 @@ export const ManageDay = () => {
           <FormField
             control={form.control}
             name={`rows.${rowIndex}.advanceTaken`}
-            render={({ field, fieldState }) => {
-              const isPresent = form.watch(`rows.${rowIndex}.isPresent`);
-              return isPresent ? (
-                <Input
-                  {...field}
-                  startContent={'₹'}
-                  type="number"
-                  className={cn(
-                    'h-9',
-                    fieldState.error &&
-                      'border-red-500 focus-visible:ring-red-500'
-                  )}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    field.onChange(value === '' ? '' : Number(value));
-                  }}
-                />
-              ) : (
-                <span className="text-gray-400 italic text-xs">N/A</span>
-              );
-            }}
+            render={({ field, fieldState }) => (
+              <Input
+                {...field}
+                startContent={'₹'}
+                type="number"
+                className={cn(
+                  'h-9',
+                  fieldState.error &&
+                    'border-red-500 focus-visible:ring-red-500'
+                )}
+              />
+            )}
           />
         );
       },
@@ -167,7 +159,7 @@ export const ManageDay = () => {
       const attendances = values.rows.map((row) => ({
         labour: row.labour,
         isPresent: row.isPresent,
-        advanceTaken: row.isPresent ? row.advanceTaken.toFixed(2) : 0,
+        advanceTaken: row.advanceTaken,
       }));
       await client.patch(`sites/${siteId}/weeks/${weekId}/days/${dayId}/`, {
         attendances,
@@ -192,7 +184,7 @@ export const ManageDay = () => {
   const handleSubmit = (data: AttendanceFormData) => mutation.mutate(data);
 
   useEffect(() => {
-    if (data && !data.isEditable) {
+    if (data && data.isEditable === false) {
       navigate(`/sites/${siteId}/weeks/${weekId}`, { replace: true });
     }
   }, [data, siteId, weekId, navigate]);
@@ -207,7 +199,8 @@ export const ManageDay = () => {
     <Scaffold title={`Attendance for ${formatDate(data?.date)}`}>
       <div className="flex-1 space-y-4">
         <div className="text-xl font-semibold text-gray-900">
-          Attendance for <span className='text-gray-600'>{formatDate(data?.date)}</span>
+          Attendance for{' '}
+          <span className="text-gray-600">{formatDate(data?.date)}</span>
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>

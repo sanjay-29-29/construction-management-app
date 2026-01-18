@@ -39,6 +39,15 @@ export type UpdateVendorContainerProps = {
 const updateVendorSchema = z.object({
   name: z.string().min(1, { error: 'Please enter a valid name' }),
   address: z.string().min(1, { error: 'Please enter a valid address' }),
+  bankAccountNumber: z.coerce
+    .string<string>()
+    .min(5, { error: 'Enter a valid bank account number.' })
+    .optional(),
+  ifscCode: z.string().min(3, { error: 'Enter a valid IFSC Code.' }).optional(),
+  gstNumber: z
+    .string()
+    .min(5, { error: 'Enter a valid GST Number.' })
+    .optional(),
   notes: z.string().optional(),
 });
 
@@ -56,6 +65,7 @@ export const UpdateVendorContainer = ({
     defaultValues: {
       name: '',
       address: '',
+      notes: '',
     },
   });
 
@@ -144,6 +154,63 @@ export const UpdateVendorContainer = ({
                     <FormDescription>
                       Enter address of the vendor
                     </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="bankAccountNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bank Account Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="59510100003455"
+                        disabled={mutation.isPending}
+                      />
+                    </FormControl>
+                    <FormDescription>Enter bank account number</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ifscCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>IFSC Code</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="BARB0MOOLAP"
+                        disabled={mutation.isPending}
+                      />
+                    </FormControl>
+                    <FormDescription>Enter bank account number</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="gstNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>GST Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="27ABCDE1234F2Z5"
+                        disabled={mutation.isPending}
+                      />
+                    </FormControl>
+                    <FormDescription>Enter GST number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -19,6 +19,7 @@ export type Labour = {
   weeklyDailyWage?: number;
   amountPaid?: number;
   totalDueToDate?: number;
+  panNumber?: string;
   documents?: Document[];
 };
 

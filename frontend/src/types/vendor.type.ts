@@ -5,6 +5,9 @@ export type Vendor = {
   name: string;
   address: string;
   notes?: string;
+  bankAccountNumber?: string;
+  ifscCode?: string;
+  gstNumber?: string;
   amountPaid?: number;
   orderCost?: number;
   payments?: Payment[];

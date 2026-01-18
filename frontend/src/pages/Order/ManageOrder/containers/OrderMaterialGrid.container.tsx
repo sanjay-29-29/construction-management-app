@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { Edit, Loader2, PlusIcon, Save } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -26,22 +26,13 @@ import type { Material, Order } from '@/types';
 
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 
-const materialSchema = z
-  .object({
-    name: z.string().min(1),
-    quantity: z.number().nonnegative(),
-    unit: z.string().min(1),
-    receivedQuantity: z.number().nonnegative(),
-    price: z.number().nonnegative(),
-  })
-  .refine(
-    (data) =>
-      data.receivedQuantity == null || data.receivedQuantity <= data.quantity,
-    {
-      path: ['receivedQuantity'],
-      message: 'Received quantity must be less than or equal to quantity',
-    }
-  );
+const materialSchema = z.object({
+  name: z.string().min(1),
+  quantity: z.number().nonnegative(),
+  unit: z.string().min(1),
+  receivedQuantity: z.number().nonnegative(),
+  price: z.number().nonnegative(),
+});
 
 const updateOrderSchema = z
   .object({
@@ -88,25 +79,30 @@ export const OrderMaterialGridContainer = ({
     },
   });
 
+  const { reset } = form;
+
   const { fields, replace, remove, append } = useFieldArray({
     control: form.control,
     name: 'materials',
   });
 
-  const normalizeMaterials = (materials: Material[]) =>
-    materials.map((m) => ({
-      ...m,
-      receivedQuantity: m.receivedQuantity ?? undefined,
-    }));
+  const normalizeMaterials = useCallback(
+    (materials: Material[]) =>
+      materials.map((m) => ({
+        ...m,
+        receivedQuantity: m.receivedQuantity ?? undefined,
+      })),
+    []
+  );
 
-  const resetMaterailForm = () => {
+  const resetMaterailForm = useCallback(() => {
     const normalizedMaterials = normalizeMaterials(order?.materials || []);
-    form.reset({
+    reset({
       materials: normalizedMaterials,
       remarks: order?.remarks,
     });
     replace(normalizedMaterials);
-  };
+  }, [reset, normalizeMaterials, order, replace]);
 
   const mutation = useMutation({
     mutationFn: async (data: UpdateMaterialFormValues) => {
@@ -126,11 +122,11 @@ export const OrderMaterialGridContainer = ({
     mutation.mutate(data);
   };
 
-  const onError = () => {
+  const onError = useCallback(() => {
     toast.error('Error', {
       description: 'Some field(s) need attention',
     });
-  };
+  }, []);
 
   useEffect(() => {
     if (order) {

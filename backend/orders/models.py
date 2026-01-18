@@ -18,7 +18,6 @@ class Order(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name="orders")
 
     cost = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    paid = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

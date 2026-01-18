@@ -88,10 +88,10 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
         gender: labour.gender,
         amountPaid: labour.amountPaid,
         openingBalance: labour.openingBalance,
+        totalDueToDate: labour.totalDueToDate,
       };
 
       let weeklyTotal = 0;
-      let toPayAtWeekend = labour.openingBalance ?? 0;
 
       const attendanceMap = new Map(
         data.dailyEntry?.flatMap((entry) =>
@@ -106,13 +106,9 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
         const record = attendanceMap.get(`${entry.date}-${labour.id}`);
         row[entry.date] = record || null;
 
-        if (record?.isPresent) {
-          weeklyTotal += record.advanceTaken;
-          toPayAtWeekend += (labour.weeklyDailyWage ?? 0) - record.advanceTaken;
-        }
+        weeklyTotal += record?.advanceTaken ?? 0;
       });
 
-      row.toPayAtWeekend = toPayAtWeekend;
       row.weeklyTotal = weeklyTotal + (labour.amountPaid ?? 0);
 
       return row;
@@ -293,8 +289,13 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
             // 3. Absent
             return (
               <div className="w-full h-full flex items-center justify-center gap-1.5 opacity-60 bg-red-100">
-                <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
-                <span className="text-red-600 text-xs ">Absent</span>
+                {val.advanceTaken > 0 ? (
+                  <div className="text-xs font-semibold text-red-400">
+                    ₹ {formatNumber(val.advanceTaken)}
+                  </div>
+                ) : (
+                  <span className="text-red-600 text-xs ">Absent</span>
+                )}
               </div>
             );
           },
@@ -385,7 +386,7 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
         },
       },
       {
-        field: 'toPayAtWeekend',
+        field: 'totalDueToDate',
         headerName: 'To Pay',
         width: 120,
         cellClass:

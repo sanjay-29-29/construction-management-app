@@ -95,7 +95,7 @@ export const PaymentPage = () => {
     },
     {
       field: 'amountPaid',
-      minWidth:120,
+      minWidth: 120,
       flex: 1,
       headerName: 'Wage for Week',
       cellRenderer: (params: ICellRendererParams) => {

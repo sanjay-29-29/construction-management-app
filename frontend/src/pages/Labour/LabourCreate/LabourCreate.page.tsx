@@ -10,7 +10,7 @@ import * as z from 'zod';
 
 import { client } from '@/axios';
 import { Scaffold } from '@/components/Scaffold';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -39,6 +39,10 @@ const labourSchema = z.object({
     .string<string>()
     .min(12, { error: 'Enter a valid aadhar number.' })
     .max(12, { error: 'Enter a valid aadhar number.' })
+    .optional(),
+  panNumber: z
+    .string()
+    .max(12, { error: 'Enter a valid PAN number.' })
     .optional(),
   bankAccountNumber: z.coerce
     .string<string>()
@@ -112,7 +116,6 @@ export const LabourCreate = () => {
             <div className="flex items-center gap-5">
               <Avatar className="h-16 w-16 relative">
                 <AvatarImage src={photoPreviewUrl ?? undefined} alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
               </Avatar>
               <FormField
                 control={form.control}
@@ -255,24 +258,44 @@ export const LabourCreate = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="aadharNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Aadhar Number</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="1234 5678 9010"
-                      disabled={mutation.isPending}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>Enter name aadhar number</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid lg:grid-cols-2 gap-5">
+              <FormField
+                control={form.control}
+                name="aadharNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Aadhar Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="1234 5678 9010"
+                        disabled={mutation.isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>Enter aadhar number</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="panNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>PAN Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="GRXPB7786C"
+                        disabled={mutation.isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>Enter PAN number</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="bankAccountNumber"
@@ -286,9 +309,7 @@ export const LabourCreate = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Enter name bank account number
-                  </FormDescription>
+                  <FormDescription>Enter bank account number</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -306,9 +327,7 @@ export const LabourCreate = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Enter name bank account number
-                  </FormDescription>
+                  <FormDescription>Enter bank account number</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

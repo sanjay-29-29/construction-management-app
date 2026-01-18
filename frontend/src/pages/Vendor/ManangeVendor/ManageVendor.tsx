@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Edit, MapPin } from 'lucide-react';
+import { Edit, Hash, IdCard, Landmark, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { Navigate, useParams } from 'react-router';
 
@@ -58,12 +58,32 @@ export const ManageVendorPage = () => {
                 </div>
                 <CardDescription>
                   <div className="flex flex-col items-start gap-2 mt-2">
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-3">
                       <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-gray-500" />
                       <span className="text-sm leading-relaxed wrap-break-words">
                         {vendor?.address}
                       </span>
                     </div>
+                    <div className="flex items-start gap-3">
+                      <Landmark className="h-4 w-4 mt-0.5 shrink-0 text-gray-500" />
+                      <span className="text-sm leading-relaxed wrap-break-words">
+                        {vendor?.bankAccountNumber}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <IdCard className="h-4 w-4 mt-0.5 shrink-0 text-gray-500" />
+                      <span className="text-sm leading-relaxed wrap-break-words">
+                        {vendor?.gstNumber}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {/* IFSC is a Code/Hash */}
+                      <Hash className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium text-muted-foreground">
+                        {vendor?.ifscCode}
+                      </span>
+                    </div>
+
                     <p className="text-sm text-gray-700 leading-relaxed line-clamp-6 whitespace-pre-line">
                       {vendor?.notes}
                     </p>

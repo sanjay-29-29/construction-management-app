@@ -49,10 +49,24 @@ const labourSchema = z.object({
   photo: z.instanceof(File).nullable().optional(),
   name: z.string().min(1, { error: 'Enter a valid first name.' }),
   gender: z.number(),
-  aadharNumber: z.coerce.string<string>().optional(),
-  bankAccountNumber: z.coerce.string<string>().optional(),
-  ifscCode: z.string().optional(),
-  branchName: z.string().optional(),
+  aadharNumber: z.coerce
+    .string<string>()
+    .min(12, { error: 'Enter a valid aadhar number.' })
+    .max(12, { error: 'Enter a valid aadhar number.' })
+    .optional(),
+  panNumber: z
+    .string()
+    .max(12, { error: 'Enter a valid PAN number.' })
+    .optional(),
+  bankAccountNumber: z.coerce
+    .string<string>()
+    .min(5, { error: 'Enter a valid bank account number.' })
+    .optional(),
+  ifscCode: z.string().min(3, { error: 'Enter a valid IFSC Code.' }).optional(),
+  branchName: z
+    .string()
+    .min(1, { error: 'Enter a valid branch name.' })
+    .optional(),
 });
 
 type UpdateLabourFormValues = z.infer<typeof labourSchema>;
@@ -266,6 +280,24 @@ export const UpdateLabourDialog = ({
                       />
                     </FormControl>
                     <FormDescription>Enter name aadhar number</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="panNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>PAN Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="GRXPB7786C"
+                        disabled={mutation.isPending}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>Enter PAN number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

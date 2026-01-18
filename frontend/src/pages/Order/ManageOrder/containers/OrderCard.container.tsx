@@ -67,10 +67,6 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
     name: z.string().min(1, { error: 'Please enter a valid name' }),
     number: z.string().min(1, { error: 'Please enter a order number' }),
     isCompleted: z.boolean(),
-    paid: z.coerce
-      .number<number>()
-      .nonnegative('Amount paid must be greater than or equal to 0')
-      .optional(),
   });
 
   type UpdateOrderFormValues = z.infer<typeof updateOrderSchema>;
@@ -251,27 +247,12 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
           <div className="grid gap-4">
             <div className="text-right grid gap-4">
               {isHeadOffice && (
-                <>
-                  <div>
-                    <p className="text-xs text-gray-500">Total Cost</p>
-                    <p className="text-sm font-semibold text-orange-700">
-                      ₹ {formatNumber(order?.cost)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Amount Paid</p>
-                    <p className="text-sm font-semibold text-green-700">
-                      ₹ {formatNumber(order?.paid)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Amount To Pay</p>
-                    <p className="text-sm font-semibold text-blue-700">
-                      ₹{' '}
-                      {formatNumber(Number(order?.cost) - Number(order?.paid))}
-                    </p>
-                  </div>
-                </>
+                <div>
+                  <p className="text-xs text-gray-500">Total Cost</p>
+                  <p className="text-sm font-semibold text-orange-700">
+                    ₹ {formatNumber(order?.cost)}
+                  </p>
+                </div>
               )}
             </div>
           </div>
@@ -348,27 +329,6 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
                             />
                           </FormControl>
                           <FormDescription>Enter order number</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name="paid"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Amount Paid</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="number"
-                              placeholder="0.00"
-                              step="0.01"
-                              autoComplete="off"
-                              disabled={updateOrderMutation.isPending}
-                            />
-                          </FormControl>
-                          <FormDescription>Enter paid amount</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}

@@ -116,18 +116,6 @@ export const VendorMaterialGrid = ({ vendor }: { vendor?: Vendor }) => {
       },
     },
     {
-      headerName: 'Amount Paid',
-      field: 'paid',
-      sortable: true,
-      filter: false,
-      valueFormatter: (params) => `₹ ${formatNumber(params.value)}`,
-      filterParams: {
-        maxNumConditions: 1,
-        filterOptions: ['contains'],
-      },
-    },
-
-    {
       headerName: 'Order Status',
       field: 'isCompleted',
       filter: 'agBooleanColumnFilter',

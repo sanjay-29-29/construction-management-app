@@ -52,10 +52,6 @@ const createOrderSchema = z.object({
   name: z.string().min(1, { error: 'Please enter a valid order name.' }),
   number: z.string().min(1, { error: 'Please enter a valid order number.' }),
   site: z.string().min(1, { error: 'Please select a valid site.' }),
-  paid: z.coerce
-    .number<number>()
-    .nonnegative('Amount paid must be greater than or equal to 0')
-    .optional(),
   materials: z
     .array(materialSchema)
     .min(1, 'At least one material is required'),
@@ -97,7 +93,6 @@ export const CreateOrderPage = () => {
       name: '',
       site: '',
       number: '',
-      paid: 0,
       materials: [],
     },
   });
@@ -455,28 +450,6 @@ export const CreateOrderPage = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="paid"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount Paid</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      startContent={'₹'}
-                      step="0.01"
-                      placeholder="0.00"
-                      disabled={mutation.isPending}
-                    />
-                  </FormControl>
-                  <FormDescription>Enter amount paid</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <div className="space-y-3 my-10">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Materials</h3>

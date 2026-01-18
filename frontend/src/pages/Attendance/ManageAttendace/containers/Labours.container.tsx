@@ -282,19 +282,20 @@ export const LabourContainer = ({
                     </span>
                   </span>
                 </div>
-
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="border-red-200 border text-red-500 hover:bg-red-50 hover:text-red-600"
-                  onClick={() => {
-                    if (labour.weekLinkId) {
-                      setLabourToDelete(labour.weekLinkId);
-                    }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {isEditable && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="border-red-200 border text-red-500 hover:bg-red-50 hover:text-red-600"
+                    onClick={() => {
+                      if (labour.weekLinkId) {
+                        setLabourToDelete(labour.weekLinkId);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             );
           })}

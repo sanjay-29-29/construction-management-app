@@ -88,7 +88,6 @@ class OrderSerializer(serializers.ModelSerializer):
             "site",
             "vendor",
             "materials",
-            "paid",
             "number",
             "remarks",
             "is_completed",
@@ -174,7 +173,6 @@ class OrderListSerializer(serializers.ModelSerializer):
     site = serializers.CharField(source="site.name")
     vendor = serializers.CharField(source="vendor.name")
     cost = serializers.FloatField()
-    paid = serializers.FloatField()
 
     class Meta:
         model = Order
@@ -187,7 +185,6 @@ class OrderListSerializer(serializers.ModelSerializer):
             "is_completed",
             "cost",
             "remarks",
-            "paid",
             "number",
         ]
 
@@ -200,7 +197,6 @@ class OrderRetrieveSerializer(serializers.ModelSerializer):
     vendor = serializers.CharField(source="vendor.name")
     completed_by = UserSerializer(read_only=True)
     cost = serializers.FloatField()
-    paid = serializers.FloatField()
 
     class Meta:
         model = Order
@@ -216,6 +212,5 @@ class OrderRetrieveSerializer(serializers.ModelSerializer):
             "cost",
             "remarks",
             "images",
-            "paid",
             "number",
         ]

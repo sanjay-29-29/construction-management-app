@@ -27,5 +27,4 @@ export type Order = {
   remarks?: string;
   completedBy?: User;
   images?: Image[];
-  paid: number;
 };

@@ -9,6 +9,7 @@ import {
   CreditCard,
   Hash,
   MapPin,
+  IdCard,
 } from 'lucide-react';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -108,9 +109,16 @@ export const LabourCard = ({
               </div>
               <div className="flex items-center gap-3">
                 {/* Aadhar is an ID/Card */}
-                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                <IdCard className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium text-muted-foreground">
                   {data?.aadharNumber ?? '—'}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                {/* Aadhar is an ID/Card */}
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium text-muted-foreground">
+                  {data?.panNumber ?? '—'}
                 </span>
               </div>
               <div className="flex items-center gap-3">

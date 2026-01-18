@@ -37,6 +37,9 @@ class VendorListSerializer(serializers.ModelSerializer):
             "name",
             "address",
             "notes",
+            "gst_number",
+            "bank_account_number",
+            "ifsc_code",
             "created_at",
         ]
         read_only_fields = (
@@ -61,6 +64,9 @@ class VendorRetrieveSerializer(serializers.ModelSerializer):
             "amount_paid",
             "order_cost",
             "payments",
+            "bank_account_number",
+            "ifsc_code",
+            "gst_number",
         ]
         read_only_fields = (
             "id",

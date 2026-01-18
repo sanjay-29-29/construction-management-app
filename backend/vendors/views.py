@@ -60,10 +60,6 @@ class VendorViewSet(viewsets.ModelViewSet):
                     output_field=DecimalField(),
                 ),
                 order_cost=ExpressionWrapper(
-                    Coalesce(Sum("orders__paid"), 0),
-                    output_field=DecimalField(),
-                )
-                + ExpressionWrapper(
                     Coalesce(Sum("payments__amount"), 0),
                     output_field=DecimalField(),
                 ),
