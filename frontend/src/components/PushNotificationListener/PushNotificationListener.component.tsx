@@ -12,82 +12,84 @@ export const PushNotificationsInit = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let actionListener: PluginListenerHandle | undefined;
-    let receiveListener: PluginListenerHandle | undefined;
-    let localActionListener: PluginListenerHandle | undefined;
-    let registrationListener: PluginListenerHandle | undefined;
+    if (import.meta.env.VITE_MOBILE_APP) {
+      let actionListener: PluginListenerHandle | undefined;
+      let receiveListener: PluginListenerHandle | undefined;
+      let localActionListener: PluginListenerHandle | undefined;
+      let registrationListener: PluginListenerHandle | undefined;
 
-    const setupNotifications = async () => {
-      const pushPermission = await PushNotifications.requestPermissions();
-      if (pushPermission.receive === 'granted') {
-        await PushNotifications.register();
-      }
-
-      await LocalNotifications.requestPermissions();
-
-      PushNotifications.addListener(
-        'pushNotificationReceived',
-        (notification) => {
-          console.log('Push notification received:', notification);
-
-          try {
-            LocalNotifications.schedule({
-              notifications: [
-                {
-                  id: Date.now(),
-                  title: notification.title ?? 'Notification',
-                  body: notification.body ?? '',
-                  extra: notification.data,
-                  sound: 'default',
-                },
-              ],
-            });
-          } catch (error) {
-            console.error('Error scheduling local notification:', error);
-          }
+      const setupNotifications = async () => {
+        const pushPermission = await PushNotifications.requestPermissions();
+        if (pushPermission.receive === 'granted') {
+          await PushNotifications.register();
         }
-      ).then((h) => {
-        receiveListener = h;
-      });
 
-      // 👆 User TAPS push notification (app in BACKGROUND/KILLED)
-      PushNotifications.addListener(
-        'pushNotificationActionPerformed',
-        (notification: ActionPerformed) => {
-          console.log('Push notification tapped:', notification);
-          const data = notification.notification.data;
+        await LocalNotifications.requestPermissions();
 
-          if (data?.internalRoute) {
-            navigate(`/${data.internalRoute}`, { replace: true });
+        PushNotifications.addListener(
+          'pushNotificationReceived',
+          (notification) => {
+            console.log('Push notification received:', notification);
+
+            try {
+              LocalNotifications.schedule({
+                notifications: [
+                  {
+                    id: Date.now(),
+                    title: notification.title ?? 'Notification',
+                    body: notification.body ?? '',
+                    extra: notification.data,
+                    sound: 'default',
+                  },
+                ],
+              });
+            } catch (error) {
+              console.error('Error scheduling local notification:', error);
+            }
           }
-        }
-      ).then((h) => {
-        actionListener = h;
-      });
+        ).then((h) => {
+          receiveListener = h;
+        });
 
-      // 👆 User TAPS local notification (app in FOREGROUND)
-      LocalNotifications.addListener(
-        'localNotificationActionPerformed',
-        (notification) => {
-          const data = notification.notification.extra;
+        // 👆 User TAPS push notification (app in BACKGROUND/KILLED)
+        PushNotifications.addListener(
+          'pushNotificationActionPerformed',
+          (notification: ActionPerformed) => {
+            console.log('Push notification tapped:', notification);
+            const data = notification.notification.data;
 
-          if (data?.internalRoute) {
-            navigate(`/${data.internalRoute}`, { replace: true });
+            if (data?.internalRoute) {
+              navigate(`/${data.internalRoute}`, { replace: true });
+            }
           }
-        }
-      ).then((h) => {
-        localActionListener = h;
-      });
-    };
+        ).then((h) => {
+          actionListener = h;
+        });
 
-    setupNotifications();
+        // 👆 User TAPS local notification (app in FOREGROUND)
+        LocalNotifications.addListener(
+          'localNotificationActionPerformed',
+          (notification) => {
+            const data = notification.notification.extra;
 
-    return () => {
-      receiveListener?.remove();
-      actionListener?.remove();
-      localActionListener?.remove();
-      registrationListener?.remove();
-    };
+            if (data?.internalRoute) {
+              navigate(`/${data.internalRoute}`, { replace: true });
+            }
+          }
+        ).then((h) => {
+          localActionListener = h;
+        });
+      };
+
+      setupNotifications();
+
+      return () => {
+        receiveListener?.remove();
+        actionListener?.remove();
+        localActionListener?.remove();
+        registrationListener?.remove();
+      };
+    }
   }, []);
 
   return null;

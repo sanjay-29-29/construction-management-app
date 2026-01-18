@@ -1,9 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router';
+import { Routes, Route } from 'react-router';
 
 import { BackButtonHandler } from '@/components/BackButtonHandler';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { PushNotificationsInit } from '@/components/PushNotificationListener';
+import { Router } from '@/components/Router';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/context/Auth';
 import {
@@ -22,7 +23,7 @@ function App() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <Router>
           <AuthProvider>
             <PushNotificationsInit />
             <BackButtonHandler />
@@ -38,7 +39,7 @@ function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </AuthProvider>
-        </BrowserRouter>
+        </Router>
       </QueryClientProvider>
       <Toaster position="top-right" richColors className="mt-10" />
     </>

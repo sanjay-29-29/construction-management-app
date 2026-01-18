@@ -76,7 +76,7 @@ export const PaymentPage = () => {
     {
       field: 'name',
       headerName: 'Labour Name',
-      width: 250,
+      width: 200,
       cellClass:
         'font-medium border-slate-200 flex items-center justify-center',
     },
@@ -95,6 +95,7 @@ export const PaymentPage = () => {
     },
     {
       field: 'amountPaid',
+      minWidth:120,
       flex: 1,
       headerName: 'Wage for Week',
       cellRenderer: (params: ICellRendererParams) => {
