@@ -4,13 +4,12 @@ import { Link } from 'react-router';
 
 import { client } from '@/axios';
 import { ProfileCard } from '@/components/ProfileCard';
-import { ROLES } from '@/constants/role.constants';
 import { useAuth } from '@/context/Auth';
 import { SearchLayout } from '@/layouts/Search';
 import type { Site } from '@/types';
 
 export const HomePage = () => {
-  const { user } = useAuth();
+  const { isHeadOffice } = useAuth();
   const { data, isError, isLoading, refetch } = useQuery({
     queryKey: ['sites'],
     queryFn: async () => {
@@ -41,9 +40,7 @@ export const HomePage = () => {
       onRetry={refetch}
       data={filteredData}
       emptyText="No sites found."
-      showBottomLink={
-        user?.role === ROLES.ADMIN || user?.role === ROLES.HEAD_OFFICE
-      }
+      showBottomLink={isHeadOffice}
       bottomLinkTo="create"
       renderItem={(site) => (
         <Link to={site.id.toString()}>

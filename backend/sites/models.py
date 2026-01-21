@@ -8,6 +8,7 @@ class Site(models.Model):
     address = models.CharField(max_length=300)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-created_at"]

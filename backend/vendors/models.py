@@ -24,6 +24,7 @@ class Vendor(models.Model):
     gst_number = models.CharField(max_length=15, blank=True)
     ifsc_code = models.CharField(max_length=30, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-created_at"]

@@ -17,7 +17,7 @@ class SiteViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Site.objects.all().reverse()
+        queryset = Site.objects.all().reverse().filter(is_deleted=False)
 
         if self.action == "retrieve":
             queryset = queryset.prefetch_related("supervisors")
@@ -41,7 +41,11 @@ class SiteViewSet(viewsets.ModelViewSet):
             return RetrieveSiteSerializer
         return CreateSiteSerializer
 
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
+
 
 class SiteDropdown(ListAPIView):
-    queryset = Site.objects.filter(is_active=True)
+    queryset = Site.objects.filter(is_active=True, is_deleted=False)
     serializer_class = SiteDropdownSerializer

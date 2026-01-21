@@ -1,4 +1,4 @@
-import { Edit, MapPin, UserCircle } from 'lucide-react';
+import { Edit, MapPin, Trash, UserCircle } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ROLES } from '@/constants/role.constants';
 import { useAuth } from '@/context/Auth';
 import type { Site } from '@/types';
 
@@ -18,11 +17,13 @@ import type { Dispatch, SetStateAction } from 'react';
 export const SiteCard = ({
   site,
   setSiteUpdateDialog,
+  setSiteDeleteDialog,
 }: {
   site?: Site;
   setSiteUpdateDialog: Dispatch<SetStateAction<boolean>>;
+  setSiteDeleteDialog: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const { user } = useAuth();
+  const { isHeadOffice } = useAuth();
 
   return (
     <Card className="border-l-4 border-l-blue-600 gap-0 shadow-none">
@@ -50,15 +51,25 @@ export const SiteCard = ({
               </span>
             </CardDescription>
           </div>
-          {(user?.role === ROLES.HEAD_OFFICE || user?.role === ROLES.ADMIN) && (
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-9 w-9 shrink-0 border-gray-300 hover:bg-gray-100"
-              onClick={() => setSiteUpdateDialog(true)}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
+          {isHeadOffice && (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 shrink-0 border-gray-300 hover:bg-gray-100"
+                onClick={() => setSiteUpdateDialog(true)}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 shrink-0 border-red-300 hover:bg-red-100 text-red-600 hover:text-red-600"
+                onClick={() => setSiteDeleteDialog(true)}
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
+            </div>
           )}
         </div>
       </CardHeader>

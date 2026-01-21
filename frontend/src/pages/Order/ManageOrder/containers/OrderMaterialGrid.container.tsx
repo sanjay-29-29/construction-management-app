@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ROLES } from '@/constants/role.constants';
 import { useAuth } from '@/context/Auth';
 import { cn } from '@/lib/utils';
 import type { Material, Order } from '@/types';
@@ -69,7 +68,7 @@ export const OrderMaterialGridContainer = ({
   order,
 }: OrderMaterialGridContainerType) => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { isHeadOffice } = useAuth();
   const [isEditable, setIsEditable] = useState<boolean>(false);
 
   const form = useForm<UpdateMaterialFormValues>({
@@ -135,8 +134,6 @@ export const OrderMaterialGridContainer = ({
   }, [order]);
 
   // boolean values
-  const isHeadOffice =
-    user?.role === ROLES.HEAD_OFFICE || user?.role === ROLES.ADMIN;
   const isOrderIncomplete = order?.isCompleted === false;
   const hasMaterials = (order?.materials?.length ?? 0) > 0;
   const isProcessing = mutation.isPending;

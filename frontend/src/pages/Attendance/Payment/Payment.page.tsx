@@ -1,23 +1,20 @@
-import { client } from '@/axios';
-import { Scaffold } from '@/components/Scaffold';
-import type { Labour } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AgGridReact } from 'ag-grid-react';
+import { isAxiosError } from 'axios';
+import { Loader2 } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
-import type { ColDef, ICellRendererParams } from 'ag-grid-community';
+import { client } from '@/axios';
+import { LoaderPage } from '@/components/LoaderPage';
+import { Scaffold } from '@/components/Scaffold';
+import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { cn, formatNumber } from '@/lib/utils';
-import { AgGridReact } from 'ag-grid-react';
-import { useEffect, useMemo } from 'react';
-import { LoaderPage } from '@/components/LoaderPage';
-import { isAxiosError } from 'axios';
-import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -26,6 +23,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PAYMENT_DROPDOWN } from '@/constants';
+import { cn, formatNumber } from '@/lib/utils';
+import type { Labour } from '@/types';
+
+import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 
 const weekPaymentFormSchema = z.object({
   payments: z.array(

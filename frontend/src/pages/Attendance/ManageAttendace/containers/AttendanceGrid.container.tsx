@@ -13,12 +13,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { PAYMENT_TYPE } from '@/constants';
 import { useAuth } from '@/context/Auth';
 import { formatDate, formatNumber } from '@/lib/utils';
 import type { AttendanceEntry, Labour, Week } from '@/types';
 
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
-import { PAYMENT_TYPE } from '@/constants';
 
 type AttendanceGridRow = Labour & {
   [key: string]: AttendanceEntry | string | number | null | undefined;
