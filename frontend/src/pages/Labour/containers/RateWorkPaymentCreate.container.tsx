@@ -47,7 +47,7 @@ export const RateWorkPaymentCreateDialog = ({
   setDialogOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
   const queryClient = useQueryClient();
-  const { siteId, rateWorkId } = useParams();
+  const { siteId, labourId } = useParams();
   const onSubmit = (data: RatePaymentFormValues) => mutation.mutate(data);
 
   const form = useForm<RatePaymentFormValues>({
@@ -60,16 +60,16 @@ export const RateWorkPaymentCreateDialog = ({
 
   const mutation = useMutation({
     mutationFn: async (data: RatePaymentFormValues) => {
-      await client.post(`rate-work/${rateWorkId}/payments/`, {
+      await client.post(`labours/${labourId}/rate-work/payments/`, {
         ...data,
-        siteId: siteId,
+        labour: labourId,
       });
     },
     onSuccess: () => {
       setDialogOpen(false);
       toast.success('The payment was created successfully.');
       queryClient.invalidateQueries({
-        queryKey: ['sites', siteId, 'rate-work'],
+        queryKey: ['sites', siteId, 'labours', labourId],
       });
     },
     onError: (error) => {
@@ -85,7 +85,7 @@ export const RateWorkPaymentCreateDialog = ({
     if (!dialogOpen) {
       form.reset();
     }
-  }, [dialogOpen]);
+  }, [dialogOpen, form]);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

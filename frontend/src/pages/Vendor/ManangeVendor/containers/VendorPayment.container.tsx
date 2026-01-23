@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { isAxiosError } from 'axios';
-import { Loader2, PlusIcon } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { Loader2, PlusIcon, Trash2 } from 'lucide-react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router';
 import { toast } from 'sonner';
 
@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { formatDate, formatNumber } from '@/lib/utils';
-import type { Payment, Vendor } from '@/types';
+import type { RateWorkPayment, Vendor } from '@/types';
 
 import { CreateVendorPayment } from './CreateVendorPayment.container';
 
@@ -49,66 +49,72 @@ export const VendorPaymentContainer = ({ data }: { data?: Vendor }) => {
     },
   });
 
-  const columnDefs: ColDef<Payment>[] = [
-    {
-      headerName: 'Date',
-      field: 'dateCreated',
-      sortable: true,
-      filter: 'agDateColumnFilter',
-      lockPosition: 'left',
-      valueFormatter: ({ value }) => formatDate(value),
-    },
-    {
-      headerName: 'Note',
-      field: 'note',
-      sortable: true,
-      filter: 'agTextColumnFilter',
-    },
-    {
-      headerName: 'Amount Paid',
-      field: 'amount',
+  const columnDefs: ColDef<RateWorkPayment>[] = useMemo(
+    () => [
+      {
+        headerName: 'Date',
+        field: 'dateCreated',
+        sortable: true,
+        filter: 'agDateColumnFilter',
+        lockPosition: 'left',
+        valueFormatter: ({ value }) => formatDate(value),
+      },
+      {
+        headerName: 'Note',
+        field: 'note',
+        sortable: true,
+        filter: 'agTextColumnFilter',
+      },
+      {
+        headerName: 'Amount Paid',
+        field: 'amount',
+        sortable: true,
+        filter: true,
+        valueFormatter: (params) => `₹ ${formatNumber(params.value)}`,
+      },
+      {
+        headerName: 'Actions',
+        filter: false,
+        sortable: false,
+        cellRenderer: (params: ICellRendererParams<RateWorkPayment>) => {
+          const id = params.data?.id;
+          return (
+            <div className="w-full flex justify-center items-center">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setPaymentToDelete(id ?? null)}
+                className="h-9 text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 />
+              </Button>
+            </div>
+          );
+        },
+      },
+    ],
+    []
+  );
+
+  const defaultColDef = useMemo(
+    () => ({
+      flex: 1,
+      minWidth: 150,
       sortable: true,
       filter: true,
-      valueFormatter: (params) => `₹ ${formatNumber(params.value)}`,
-    },
-    {
-      headerName: 'Actions',
-      filter: false,
-      sortable: false,
-      cellRenderer: (params: ICellRendererParams<Payment>) => {
-        const id = params.data?.id;
-        return (
-          <div className="w-full flex justify-center items-center">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setPaymentToDelete(id ?? null)}
-              className="h-9 text-destructive hover:text-destructive hover:bg-destructive/10"
-            >
-              Remove
-            </Button>
-          </div>
-        );
+      resizable: true,
+      suppressMovable: true,
+      filterParams: {
+        buttons: ['apply', 'reset'],
       },
-    },
-  ];
-
-  const defaultColDef = {
-    flex: 1,
-    minWidth: 150,
-    sortable: true,
-    filter: true,
-    resizable: true,
-    suppressMovable: true,
-    filterParams: {
-      buttons: ['apply', 'reset'],
-    },
-  };
+    }),
+    []
+  );
 
   return (
     <>
-      <div>
-        <div className="flex items-center justify-between mb-4">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
           <div className="text-xl font-semibold">Your Payments</div>
           <Button
             variant="outline"

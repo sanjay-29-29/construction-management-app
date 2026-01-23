@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { Loader2 } from 'lucide-react';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
@@ -28,17 +28,10 @@ import {
   Form,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import type { DropdownType } from '@/types';
+import type { Labour } from '@/types';
 
 const updateRateWorkSchema = z.object({
-  name: z.string().min(1, 'Enter a valid first name.'),
+  name: z.string().min(1, 'Enter a valid name.'),
   quantity: z.coerce
     .number<number>()
     .nonnegative('Quantity must be not negative.'),
@@ -46,7 +39,6 @@ const updateRateWorkSchema = z.object({
     .number<number>()
     .nonnegative('Cost per unit must be not negative.'),
   unit: z.string().min(1, 'Enter a valid unit.'),
-  labour: z.string().min(1, 'Select a valid labour.'),
   isCompleted: z.boolean(),
 });
 
@@ -56,47 +48,32 @@ export const CreateRateWorkDialog = ({
   dialog,
   setDialogState,
 }: {
+  data?: Labour;
   dialog: boolean;
   setDialogState: Dispatch<SetStateAction<boolean>>;
 }) => {
   const queryClient = useQueryClient();
-  const { siteId } = useParams();
+  const { labourId, siteId } = useParams();
   const form = useForm<CreateRateWorkFormValues>({
     resolver: zodResolver(updateRateWorkSchema),
     defaultValues: {
       name: '',
       quantity: 0,
       unit: '',
-      labour: '',
       costPerUnit: 0,
       isCompleted: false,
     },
   });
 
-  const {
-    data: dropdownData,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryFn: async () => {
-      const res = await client.get<DropdownType[]>(
-        `sites/${siteId}/labours/dropdown/?type=2`
-      );
-      return res.data;
-    },
-    queryKey: ['sites', siteId, 'labours', 'dropdown', 2],
-    enabled: dialog,
-  });
-
   const mutation = useMutation({
     mutationFn: async (data: CreateRateWorkFormValues) => {
-      await client.post(`sites/${siteId}/rate-work/`, data);
+      await client.post(`labours/${labourId}/rate-work/`, data);
     },
     onSuccess: () => {
       setDialogState(false);
       toast.success('The rate work was created successfully.');
       queryClient.invalidateQueries({
-        queryKey: ['sites', siteId, 'rate-work'],
+        queryKey: ['sites', siteId, 'labours', labourId],
       });
     },
     onError: (error) => {
@@ -112,13 +89,7 @@ export const CreateRateWorkDialog = ({
     if (!dialog) {
       form.reset();
     }
-  }, [dialog]);
-
-  useEffect(() => {
-    if (isError) {
-      toast.error('Error fetching labours.');
-    }
-  }, [isError]);
+  }, [dialog, form]);
 
   const onSubmit = (data: CreateRateWorkFormValues) => mutation.mutate(data);
 
@@ -209,37 +180,6 @@ export const CreateRateWorkDialog = ({
                       />
                     </FormControl>
                     <FormDescription>Enter unit of the work.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="labour"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Labour</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={mutation.isPending || isLoading}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select labour" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {dropdownData?.map((val) => (
-                          <SelectItem value={val.value} key={val.value}>
-                            {val.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Select the labour for rate work.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

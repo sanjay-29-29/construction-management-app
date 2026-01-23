@@ -1,20 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { Navigate, useParams } from 'react-router';
 
 import { client } from '@/axios';
 import { LoaderPage } from '@/components/LoaderPage';
 import { Scaffold } from '@/components/Scaffold';
+import { LABOUR_ROLES } from '@/constants';
+import {
+  LabourCard,
+  LabourDocumentsContainer,
+  RateWorkPayments,
+} from '@/pages/Labour/containers';
 import type { Labour } from '@/types';
 
-import { LabourDocumentsContainer } from './containers/LabourDocuments.container';
-import { UpdateLabourDialog } from './containers/UpdateLabour.container';
-import { LabourCard } from '../LabourHome/containers/LabourCard.component';
+import { RateWorkGrid } from '../containers/RateWorkGrid.container';
 
 export const ManageLabour = () => {
   const { siteId, labourId } = useParams();
-  const [isLabourUpdateDialogOpen, setLabourUpdateDialog] =
-    useState<boolean>(false);
 
   const { data, isError, isLoading } = useQuery({
     queryFn: async () => {
@@ -26,6 +28,11 @@ export const ManageLabour = () => {
     queryKey: ['sites', siteId, 'labours', labourId],
   });
 
+  const isRateWork = useMemo(
+    () => data?.type === LABOUR_ROLES.RATE_WORKER,
+    [data]
+  );
+
   if (isError) {
     return <Navigate to="/sites" replace />;
   }
@@ -36,15 +43,16 @@ export const ManageLabour = () => {
 
   return (
     <Scaffold title="Manage Labour">
-      <div className="grid gap-10">
-        <LabourCard data={data} setLabourUpdateDialog={setLabourUpdateDialog} />
+      <div className="grid gap-16">
+        <LabourCard data={data} />
+        {isRateWork && (
+          <>
+            <RateWorkGrid data={data} />
+            <RateWorkPayments data={data} />
+          </>
+        )}
         <LabourDocumentsContainer data={data} />
       </div>
-      <UpdateLabourDialog
-        data={data}
-        open={isLabourUpdateDialogOpen}
-        onOpenChange={setLabourUpdateDialog}
-      />
     </Scaffold>
   );
 };

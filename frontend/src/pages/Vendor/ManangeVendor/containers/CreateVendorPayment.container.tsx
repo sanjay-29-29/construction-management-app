@@ -82,7 +82,7 @@ export const CreateVendorPayment = ({
     if (!dialogOpen) {
       form.reset();
     }
-  }, [dialogOpen]);
+  }, [dialogOpen, form]);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

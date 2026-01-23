@@ -1,4 +1,4 @@
-import type { Payment } from './ratework.type';
+import type { RateWorkPayment } from './ratework.type';
 
 export type Vendor = {
   id: string;
@@ -10,5 +10,5 @@ export type Vendor = {
   gstNumber?: string;
   amountPaid?: number;
   orderCost?: number;
-  payments?: Payment[];
+  payments?: RateWorkPayment[];
 };

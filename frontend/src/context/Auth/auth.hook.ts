@@ -1,6 +1,6 @@
 import { Preferences } from '@capacitor/preferences';
 import { useQueryClient } from '@tanstack/react-query';
-import { useContext } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
@@ -13,7 +13,7 @@ export const useAuth = () => {
   const { isAuth, setIsAuth, user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const logout = () => {
+  const logout = useCallback(() => {
     queryClient.removeQueries({
       predicate: () => true,
     });
@@ -22,12 +22,14 @@ export const useAuth = () => {
     setUser(undefined);
     toast.success('Logged out successfully.');
     navigate('/login', { replace: true });
-  };
+  }, [queryClient, setIsAuth, setUser, navigate]);
 
-  const isHeadOffice =
-    user?.role === ROLES.HEAD_OFFICE || user?.role === ROLES.ADMIN;
+  const isHeadOffice = useMemo<boolean>(
+    () => user?.role === ROLES.HEAD_OFFICE || user?.role === ROLES.ADMIN,
+    [user]
+  );
 
-  const isAdmin = user?.role === ROLES.ADMIN;
+  const isAdmin = useMemo(() => user?.role === ROLES.ADMIN, [user]);
 
   return {
     isAuth,

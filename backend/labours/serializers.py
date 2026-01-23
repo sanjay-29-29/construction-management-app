@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from rate_work import serializers as rate_work_serializers
 from . import models as models
 
 
@@ -67,10 +68,29 @@ class LabourDocumentRetrieveSerializer(serializers.ModelSerializer):
         ]
 
 
+class LabourListSerializer(serializers.ModelSerializer):
+    type = serializers.CharField(source="get_type_display", read_only=True)
+    gender = serializers.CharField(source="get_gender_display", read_only=True)
+
+    class Meta:
+        model = models.Labour
+        fields = [
+            "id",
+            "name",
+            "type",
+            "gender",
+            "photo",
+        ]
+
+
 class LabourRetrieveSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source="get_type_display", read_only=True)
     gender = serializers.CharField(source="get_gender_display", read_only=True)
     documents = LabourDocumentRetrieveSerializer(many=True)
+    rate_work_payments = rate_work_serializers.RateWorkPaymentSerializer(many=True)
+    rate_works = rate_work_serializers.RateWorkListSerializer(many=True)
+    amount_paid = serializers.FloatField()
+    rate_work_payment_total = serializers.FloatField()
 
     class Meta:
         model = models.Labour
@@ -86,6 +106,10 @@ class LabourRetrieveSerializer(serializers.ModelSerializer):
             "branch_name",
             "photo",
             "documents",
+            "rate_work_payments",
+            "rate_works",
+            "amount_paid",
+            "rate_work_payment_total",
         ]
 
 

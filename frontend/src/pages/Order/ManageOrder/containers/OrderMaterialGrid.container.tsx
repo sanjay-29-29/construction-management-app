@@ -131,7 +131,7 @@ export const OrderMaterialGridContainer = ({
     if (order) {
       resetMaterailForm();
     }
-  }, [order]);
+  }, [order, resetMaterailForm]);
 
   // boolean values
   const isOrderIncomplete = order?.isCompleted === false;

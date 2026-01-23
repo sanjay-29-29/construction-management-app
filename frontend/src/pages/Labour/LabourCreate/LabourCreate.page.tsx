@@ -10,7 +10,7 @@ import * as z from 'zod';
 
 import { client } from '@/axios';
 import { Scaffold } from '@/components/Scaffold';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -116,6 +116,7 @@ export const LabourCreate = () => {
             <div className="flex items-center gap-5">
               <Avatar className="h-16 w-16 relative">
                 <AvatarImage src={photoPreviewUrl ?? undefined} alt="@shadcn" />
+                <AvatarFallback />
               </Avatar>
               <FormField
                 control={form.control}

@@ -15,7 +15,7 @@ export const LabourHome = () => {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['sites', siteId, 'labours'],
     queryFn: async () => {
-      const response = await client.get<Labour[]>(`sites/${siteId}/labours`);
+      const response = await client.get<Labour[]>(`sites/${siteId}/labours/`);
       return response.data;
     },
   });
@@ -45,7 +45,7 @@ export const LabourHome = () => {
       bottomLinkTo="create"
       showBottomLink={true}
       renderItem={(labour) => (
-        <Link to={labour.id.toString()}>
+        <Link to={labour.id.toString()} key={labour.id}>
           <ProfileCard
             title={labour.name}
             description={labour.type}

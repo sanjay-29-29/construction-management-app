@@ -57,7 +57,7 @@ export const RateWorkUpdateDialog = ({
 }) => {
   const queryClient = useQueryClient();
   const { isHeadOffice } = useAuth();
-  const { siteId, rateWorkId } = useParams();
+  const { siteId, labourId } = useParams();
   const form = useForm({
     resolver: zodResolver(updateRateWorkSchema),
     defaultValues: {
@@ -70,14 +70,17 @@ export const RateWorkUpdateDialog = ({
   });
 
   const mutation = useMutation({
-    mutationFn: async (data: UpdateRateWorkFormValues) => {
-      await client.patch(`sites/${siteId}/rate-work/${rateWorkId}/`, data);
+    mutationFn: async (formData: UpdateRateWorkFormValues) => {
+      await client.patch(
+        `labours/${labourId}/rate-work/${data?.id}/`,
+        formData
+      );
     },
     onSuccess: () => {
       setDialogState(false);
       toast.success('The rate work was updated successfully.');
       queryClient.invalidateQueries({
-        queryKey: ['sites', siteId, 'rate-work', rateWorkId],
+        queryKey: ['sites', siteId, 'labours', labourId],
       });
     },
     onError: (error) => {
@@ -90,7 +93,7 @@ export const RateWorkUpdateDialog = ({
   });
 
   useEffect(() => {
-    if (!dialog) {
+    if (data) {
       form.reset(data);
     }
   }, [data, dialog, form]);

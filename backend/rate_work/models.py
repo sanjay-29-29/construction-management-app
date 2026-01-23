@@ -2,7 +2,6 @@ import uuid
 from django.db import models
 
 from labours import models as labours_models
-from sites import models as sites_models
 
 
 class RateWork(models.Model):
@@ -12,11 +11,6 @@ class RateWork(models.Model):
         editable=False,
     )
     name = models.CharField(max_length=100)
-    site = models.ForeignKey(
-        sites_models.Site,
-        on_delete=models.CASCADE,
-        related_name="rate_works",
-    )
     labour = models.ForeignKey(
         labours_models.Labour,
         on_delete=models.CASCADE,
@@ -34,10 +28,11 @@ class RateWork(models.Model):
         default=0,
     )
     is_completed = models.BooleanField(default=False)
+    date_created = models.DateField(auto_now=True)
 
     @property
     def total_cost(self):
-        return self.quantity * self.amount
+        return self.quantity * self.cost_per_unit
 
     def __str__(self):
         return f"{self.name} {self.labour}"
@@ -66,11 +61,11 @@ class Payment(models.Model):
 
 
 class RatePayment(Payment):
-    rate_work = models.ForeignKey(
-        RateWork,
+    labour = models.ForeignKey(
+        labours_models.Labour,
         on_delete=models.CASCADE,
-        related_name="payments",
+        related_name="rate_work_payments",
     )
 
     def __str__(self):
-        return f"{self.rate_work} {super().__str__()}"
+        return f"{self.labour} {super().__str__()}"

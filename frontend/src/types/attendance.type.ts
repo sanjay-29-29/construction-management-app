@@ -1,3 +1,5 @@
+import type { RateWork, RateWorkPayment } from './ratework.type';
+
 export type Document = {
   document: string;
   fileName: string;
@@ -17,11 +19,14 @@ export type Labour = {
   ifscCode?: string;
   openingBalance?: number;
   weeklyDailyWage?: number;
-  amountPaid?: number;
   totalDueToDate?: number;
   panNumber?: string;
   paymentType?: number;
   documents?: Document[];
+  rateWorks?: RateWork[];
+  rateWorkPayments?: RateWorkPayment[];
+  rateWorkPaymentTotal?: number;
+  amountPaid?: number;
 };
 
 export type AttendanceEntry = {
