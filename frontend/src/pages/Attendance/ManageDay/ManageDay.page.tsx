@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { isAxiosError } from 'axios';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -33,6 +33,9 @@ const attendanceRowSchema = z.object({
   labour: z.string().min(1, 'Labour ID is required'),
   name: z.string().min(1, 'Name is required'),
   isPresent: z.boolean(),
+  multiplier: z.coerce
+    .number<number>()
+    .nonnegative('Multiplier cannot be negative'),
   advanceTaken: z.coerce
     .number<number>()
     .nonnegative('Advance cannot be negative'),
@@ -85,6 +88,7 @@ export const ManageDay = () => {
           isPresent: record?.isPresent ?? false,
           advanceTaken: record?.advanceTaken ?? 0,
           paymentType: record?.paymentType ?? 1,
+          multiplier: record?.multiplier ?? 1,
         };
       });
 
@@ -120,110 +124,145 @@ export const ManageDay = () => {
 
   const handleSubmit = (data: AttendanceFormData) => mutation.mutate(data);
 
-  const columnDefs: ColDef[] = useMemo(
-    () => [
-      {
-        field: 'name',
-        headerName: 'Labour Name',
-        pinned: 'left',
-        width: 250,
-      },
-      {
-        field: 'gender',
-        headerName: 'Gender',
-        width: 100,
-      },
-      {
-        headerName: 'Present',
-        width: 100,
-        cellRenderer: (params: ICellRendererParams) => {
-          const rowIndex = params.node.rowIndex;
-          if (rowIndex == null) return;
+  const columnDefs: ColDef[] = [
+    {
+      field: 'name',
+      headerName: 'Labour Name',
+      pinned: 'left',
+      width: 250,
+    },
+    {
+      field: 'gender',
+      headerName: 'Gender',
+      width: 100,
+    },
+    {
+      headerName: 'Present',
+      width: 100,
+      cellRenderer: (params: ICellRendererParams) => {
+        const rowIndex = params.node.rowIndex;
+        if (rowIndex == null) return;
 
-          return (
-            <FormField
-              control={form.control}
-              name={`rows.${rowIndex}.isPresent`}
-              render={({ field }) => (
-                <div className="flex justify-center w-full">
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </div>
-              )}
-            />
-          );
-        },
-      },
-      {
-        headerName: 'Advance',
-        minWidth: 140,
-        flex: 1,
-        cellRenderer: (params: ICellRendererParams) => {
-          const rowIndex = params.node.rowIndex;
-          if (rowIndex == null) return;
-
-          return (
-            <FormField
-              control={form.control}
-              name={`rows.${rowIndex}.advanceTaken`}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  startContent={'₹'}
-                  type="number"
-                  className={cn(
-                    'h-9',
-                    fieldState.error &&
-                      'border-red-500 focus-visible:ring-red-500'
-                  )}
+        return (
+          <FormField
+            control={form.control}
+            name={`rows.${rowIndex}.isPresent`}
+            render={({ field }) => (
+              <div className="flex justify-center w-full">
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(val) => {
+                    if (!val) {
+                      form.setValue(`rows.${rowIndex}.multiplier`, 1);
+                    }
+                    field.onChange(val);
+                  }}
                 />
-              )}
-            />
-          );
-        },
+              </div>
+            )}
+          />
+        );
       },
-      {
-        headerName: 'Payment Type',
-        cellClass: 'flex items-center justify-center',
-        cellRenderer: (params: ICellRendererParams) => {
-          const rowIndex = params.node.rowIndex;
-          if (rowIndex == null) return;
+    },
+    {
+      headerName: 'Multiplier',
+      width: 100,
+      cellRenderer: (params: ICellRendererParams) => {
+        const rowIndex = params.node.rowIndex;
+        if (rowIndex == null) return;
 
-          return (
-            <FormField
-              control={form.control}
-              name={`rows.${rowIndex}.paymentType`}
-              render={({ field }) => (
-                <FormItem>
-                  <Select
-                    onValueChange={(val) => field.onChange(Number(val))}
-                    defaultValue={String(field.value)}
-                    disabled={mutation.isPending}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="h-9 w-full truncate">
-                        <SelectValue placeholder="Select Payment Type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {PAYMENT_DROPDOWN.map((val) => (
-                        <SelectItem value={val.value} key={val.value}>
-                          {val.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-          );
-        },
+        const isPresent = form.watch(`rows.${rowIndex}.isPresent`);
+
+        return (
+          <FormField
+            control={form.control}
+            name={`rows.${rowIndex}.multiplier`}
+            render={({ field, fieldState }) => (
+              <Input
+                {...field}
+                disabled={!isPresent}
+                type="number"
+                step="0.01"
+                className={cn(
+                  'h-9',
+                  fieldState.error &&
+                    'border-red-500 focus-visible:ring-red-500',
+                  !isPresent && 'bg-gray-50 cursor-not-allowed'
+                )}
+              />
+            )}
+          />
+        );
       },
-    ],
-    [form.control, mutation.isPending]
-  );
+    },
+
+    {
+      headerName: 'Advance',
+      minWidth: 140,
+      flex: 1,
+      cellRenderer: (params: ICellRendererParams) => {
+        const rowIndex = params.node.rowIndex;
+        if (rowIndex == null) return;
+
+        return (
+          <FormField
+            control={form.control}
+            name={`rows.${rowIndex}.advanceTaken`}
+            render={({ field, fieldState }) => (
+              <Input
+                {...field}
+                startContent={'₹'}
+                type="number"
+                step="0.01"
+                className={cn(
+                  'h-9',
+                  fieldState.error &&
+                    'border-red-500 focus-visible:ring-red-500'
+                )}
+              />
+            )}
+          />
+        );
+      },
+    },
+    {
+      headerName: 'Payment Type',
+      cellClass: 'flex items-center justify-center',
+      cellRenderer: (params: ICellRendererParams) => {
+        const rowIndex = params.node.rowIndex;
+        if (rowIndex == null) return;
+
+        return (
+          <FormField
+            control={form.control}
+            name={`rows.${rowIndex}.paymentType`}
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={(val) => field.onChange(Number(val))}
+                  defaultValue={String(field.value)}
+                  disabled={mutation.isPending}
+                >
+                  <FormControl>
+                    <SelectTrigger className="h-9 w-full truncate">
+                      <SelectValue placeholder="Select Payment Type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {PAYMENT_DROPDOWN.map((val) => (
+                      <SelectItem value={val.value} key={val.value}>
+                        {val.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+        );
+      },
+    },
+  ];
 
   useEffect(() => {
     if (data) {

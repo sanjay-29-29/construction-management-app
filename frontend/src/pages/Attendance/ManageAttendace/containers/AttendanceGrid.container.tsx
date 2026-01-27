@@ -276,12 +276,12 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
                   {val.advanceTaken > 0 ? (
                     <div className="flex-1 flex flex-col justify-center items-center border-r border-slate-200 font-semibold bg-amber-50 text-amber-400">
                       <span className="text-xs font-semibold text-amber-700">
-                        {`₹ ${formatNumber(val.advanceTaken)} (${val.paymentType === PAYMENT_TYPE.CASH ? 'C' : 'B'})`}
+                        {`₹ ${formatNumber(val.advanceTaken)} ${(val.multiplier ?? 0) !== 1 ? `${formatNumber(val.multiplier)}x` : ''} (${val.paymentType === PAYMENT_TYPE.CASH ? 'C' : 'B'})`}
                       </span>
                     </div>
                   ) : (
                     <div className="flex-1 flex flex-col justify-center items-center border-r border-slate-200 font-semibold bg-green-50 text-emerald-500 text-xs">
-                      Present
+                      {`Present ${(val.multiplier ?? 0) !== 1 ? `${formatNumber(val.multiplier)}x` : ''} `}
                     </div>
                   )}
                 </div>

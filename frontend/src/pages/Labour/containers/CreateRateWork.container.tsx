@@ -137,6 +137,7 @@ export const CreateRateWorkDialog = ({
                         placeholder="Enter cost per unit"
                         disabled={mutation.isPending}
                         startContent="₹"
+                        step="0.01"
                         {...field}
                       />
                     </FormControl>
@@ -155,6 +156,7 @@ export const CreateRateWorkDialog = ({
                       <Input
                         type="number"
                         placeholder="Enter quantity"
+                        step="0.01"
                         disabled={mutation.isPending}
                         {...field}
                       />

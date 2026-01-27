@@ -1,5 +1,5 @@
 from django.db.models.functions.comparison import Coalesce
-from django.db.models import Sum, OuterRef, Subquery, DecimalField, Value, F
+from django.db.models import Sum, OuterRef, Subquery, DecimalField, Value, F, ExpressionWrapper
 from django.db import transaction
 
 from rest_framework import serializers
@@ -19,6 +19,7 @@ class LabourAttendanceRetrieveSerializer(serializers.ModelSerializer):
             "is_present",
             "advance_taken",
             "payment_type",
+            "multiplier",
         ]
 
 
@@ -172,7 +173,7 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
 
         # -------------------------------------------------------
         # SUBQUERY 2: HISTORICAL EARNINGS
-        # (Sum of Daily Wage * Is_Present for all PAST dates)
+        # Calculation: Sum of (Weekly_Wage * Multiplier) where Is_Present is True
         # -------------------------------------------------------
         history_earned_subquery = (
             models.LabourAttendance.objects.filter(
@@ -181,16 +182,25 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
                 is_present=True,
             )
             .annotate(
-                wage_for_day=Subquery(wage_lookup_sql, output_field=DecimalField())
+                # 1. Get the base wage for that specific day/week
+                base_wage=Subquery(wage_lookup_sql, output_field=DecimalField())
+            )
+            .annotate(
+                # 2. Calculate actual pay for that day: Base Wage * Multiplier
+                # We use ExpressionWrapper to ensure the Float(multiplier) * Decimal(wage) returns a Decimal
+                day_pay=ExpressionWrapper(
+                    F("base_wage") * F("multiplier"),
+                    output_field=DecimalField()
+                )
             )
             .values("labour")
-            .annotate(total=Sum("wage_for_day"))
+            .annotate(total=Sum("day_pay")) # 3. Sum the calculated daily pays
             .values("total")
         )
 
         # -------------------------------------------------------
         # SUBQUERY 3: HISTORICAL ADVANCES
-        # (Sum of advances taken in PAST weeks)
+        # (Unchanged)
         # -------------------------------------------------------
         history_advance_subquery = (
             models.LabourAttendance.objects.filter(
@@ -203,17 +213,15 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
         )
 
         # -------------------------------------------------------
-        # SUBQUERY 4: HISTORICAL PAYMENTS (*** NEW ***)
-        # (Sum of actual LabourPayment records from PAST weeks)
+        # SUBQUERY 4: HISTORICAL PAYMENTS
+        # (Unchanged)
         # -------------------------------------------------------
         history_paid_subquery = (
             models.LabourPayment.objects.filter(
-                # Link Payment -> Assignment -> Labour
                 labour__labour=OuterRef("labour"),
-                # Link Payment -> Assignment -> Week -> Start Date
                 labour__week__start_date__lt=start_date,
             )
-            .values("labour__labour")  # Group by the Labourer
+            .values("labour__labour")
             .annotate(total=Sum("amount_paid"))
             .values("total")
         )
@@ -221,7 +229,8 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
         # -------------------------------------------------------
         # SUBQUERY 5: CURRENT WEEK ACTIVITY
         # -------------------------------------------------------
-        # A. Current Advances
+        
+        # A. Current Advances (Unchanged)
         current_advance_subquery = (
             models.LabourAttendance.objects.filter(
                 labour=OuterRef("labour"),
@@ -232,16 +241,17 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
             .values("total")
         )
 
-        # B. Current Days Worked (Count)
-        current_present_count_subquery = (
+        # B. Current "Billable Days" (Sum of Multipliers)
+        # Instead of counting rows (1 day = 1), we sum the multipliers (1 day could be 1.5 or 0.5)
+        current_billable_units_subquery = (
             models.LabourAttendance.objects.filter(
                 labour=OuterRef("labour"),
                 daily_entry__week=instance,
                 is_present=True,
             )
             .values("labour")
-            .annotate(cnt=Sum(Value(1)))
-            .values("cnt")
+            .annotate(total_units=Sum("multiplier"))
+            .values("total_units")
         )
 
         # -------------------------------------------------------
@@ -252,7 +262,7 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
             .select_related("labour")
             .prefetch_related("week_payment")
             .annotate(
-                # 1. Bring in all subqueries (Coalesce handles None -> 0)
+                # 1. Bring in all subqueries
                 hist_earned=Coalesce(
                     Subquery(history_earned_subquery, output_field=DecimalField()),
                     Value(0, output_field=DecimalField()),
@@ -269,33 +279,33 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
                     Subquery(current_advance_subquery, output_field=DecimalField()),
                     Value(0, output_field=DecimalField()),
                 ),
-                # Calculate current earnings: (Days Present * Current Week Wage)
-                curr_earned=Coalesce(
-                    Subquery(
-                        current_present_count_subquery, output_field=DecimalField()
-                    ),
-                    Value(0, output_field=DecimalField()),
+                # 2. Calculate Current Earnings
+                # Logic: (Sum of Multipliers for this week) * (This Week's Daily Wage)
+                curr_earned=ExpressionWrapper(
+                    Coalesce(
+                        Subquery(current_billable_units_subquery, output_field=DecimalField()),
+                        Value(0, output_field=DecimalField()),
+                    ) * F("weekly_daily_wage"),
+                    output_field=DecimalField()
                 )
-                * F("weekly_daily_wage"),
             )
             .annotate(
-                # 2. Calculate Opening Balance
-                # (Past Balance + Past Earnings) - (Past Advances + Past Payments)
+                # 3. Opening Balance
                 opening_balance=(
                     F("labour__previous_balance")
                     + F("hist_earned")
                     - (F("hist_advance") + F("hist_paid"))
                 ),
-                # 3. Calculate Current Week Net
+                # 4. Current Week Net
                 current_week_net=F("curr_earned") - F("curr_advance"),
-                # 4. Total Due Now (Opening + Current Net)
+                # 5. Total Due Now
                 total_due_to_date=(
                     (
                         F("labour__previous_balance")
                         + F("hist_earned")
                         - (F("hist_advance") + F("hist_paid"))
-                    )  # Opening
-                    + (F("curr_earned") - F("curr_advance"))  # Current
+                    )
+                    + (F("curr_earned") - F("curr_advance"))
                 ),
             )
         )
@@ -333,6 +343,7 @@ class LabourAttendanceUpdateSerializer(serializers.ModelSerializer):
             "is_present",
             "advance_taken",
             "payment_type",
+            "multiplier",
         ]
 
 
@@ -367,6 +378,7 @@ class DailyEntryUpdateSerializer(serializers.ModelSerializer):
                             labour_id=item["labour"],
                             is_present=item["is_present"],
                             advance_taken=item["advance_taken"],
+                            multiplier = item["multiplier"],
                         )
                         for item in attendance_data
                     ]

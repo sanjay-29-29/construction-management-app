@@ -143,6 +143,7 @@ export const RateWorkUpdateDialog = ({
                         <FormControl>
                           <Input
                             type="number"
+                            step="0.01"
                             placeholder="Enter cost per unit"
                             startContent="₹"
                             {...field}
@@ -163,6 +164,7 @@ export const RateWorkUpdateDialog = ({
                         <FormControl>
                           <Input
                             type="number"
+                            step="0.01"
                             placeholder="Enter quantity"
                             disabled={mutation.isPending}
                             {...field}

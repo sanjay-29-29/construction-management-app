@@ -121,6 +121,7 @@ export const PaymentPage = () => {
                 {...field}
                 startContent={'₹'}
                 type="number"
+                step="0.01"
                 className={cn(
                   'h-9',
                   fieldState.error &&

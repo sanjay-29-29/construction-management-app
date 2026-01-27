@@ -1,8 +1,9 @@
 import uuid
+from datetime import timedelta
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
-from datetime import timedelta
-from django.core.exceptions import ValidationError
 
 from labours import models as labours_models
 from sites import models as sites_models
@@ -151,20 +152,18 @@ class LabourAttendance(models.Model):
         on_delete=models.CASCADE,
         related_name="attendance_records",
     )
-
     is_present = models.BooleanField(default=False)
-
     payment_type = models.IntegerField(
         choices=PaymentType,
         default=PaymentType.BANK_TRANSFER,
         blank=True,
     )
-
     advance_taken = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=0,
     )
+    multiplier = models.FloatField(default=1, blank=True)
 
     class Meta:
         # Prevent double entry for same person same day

@@ -32,6 +32,7 @@ export type Labour = {
 export type AttendanceEntry = {
   advanceTaken: number;
   paymentType?: number;
+  multiplier?: number;
   isPresent: boolean;
   labour: string;
 };

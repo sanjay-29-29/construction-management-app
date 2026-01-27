@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { Trash2, Loader2, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -107,12 +107,19 @@ const AddLabourDialog = ({
     },
   });
 
-  const onSubmit = (values: AddLabourFormValues) => {
-    createMutation.mutate(values);
-  };
+  const onSubmit = useCallback(
+    (values: AddLabourFormValues) => {
+      createMutation.mutate(values);
+    },
+    [createMutation]
+  );
 
-  const selectableLabours = availableLabours?.filter(
-    (l) => !existingLabours.some((existing) => existing.id === l.value)
+  const selectableLabours = useMemo(
+    () =>
+      availableLabours?.filter(
+        (l) => !existingLabours.some((existing) => existing.id === l.value)
+      ),
+    [availableLabours, existingLabours]
   );
 
   return (
