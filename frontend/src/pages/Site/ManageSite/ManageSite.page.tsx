@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { ClipboardCheck, Loader2, Users2 } from 'lucide-react';
+import { ClipboardCheck, HardHatIcon, Loader2, Users2 } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -106,6 +106,18 @@ export const ManageSite = () => {
               }
               className="hover:bg-white/60"
             />
+            <ItemCard
+              title="Rate Work"
+              description="View and manage rate work"
+              to="labours/rate-work"
+              icon={
+                <div className="bg-blue-100 p-2 rounded-lg">
+                  <HardHatIcon className="h-6 w-6 text-blue-600" />
+                </div>
+              }
+              className="hover:bg-white/60"
+            />
+
           </div>
         </div>
         <SiteOrderGrid site={site} />

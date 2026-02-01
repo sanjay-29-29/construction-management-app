@@ -17,8 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 FROM python:3.13-slim
 
 RUN useradd -m -r appuser && \
-   mkdir /app && \
-   chown -R appuser /app
+    mkdir /app && \
+    chown -R appuser /app
 
 RUN mkdir -p /app/static /app/media && \
     chown -R appuser:appuser /app/static /app/media
@@ -38,6 +38,7 @@ RUN chmod +x /app/entrypoint.sh
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1 
+ENV DJANGO_SETTINGS_MODULE=ks_constructions.prod_settings
 
 USER appuser
 

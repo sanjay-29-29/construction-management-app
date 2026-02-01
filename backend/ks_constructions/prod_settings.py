@@ -27,14 +27,25 @@ environ.Env.read_env(BASE_DIR / ".env")
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = "CoNGpDII7x9OHHN7UmD8bfLedbI2gELp+23janmrldf"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(env("DEBUG", default=0))
+DEBUG = False
 
-CORS_ORIGIN_ALLOW_ALL = True
+ALLOWED_HOSTS = [
+    "https://ksconstruction.online",
+    "https://www.kconstruction.online",
+]
 
-ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://ksconstruction.online",
+    "https://www.ksconstruction.online",
+]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 firebase_admin.initialize_app(
     firebase_admin.credentials.Certificate("credentials.json")
@@ -56,7 +67,6 @@ INSTALLED_APPS = [
     "django_probes",
     "django_cleanup.apps.CleanupConfig",
     "phonenumber_field",
-    # "silk",
     "corsheaders",
     "storages",
     "fcm_django",
@@ -76,7 +86,6 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "users.CustomUser"
 
 MIDDLEWARE = [
-    # "silk.middleware.SilkyMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -134,24 +143,16 @@ WSGI_APPLICATION = "ks_constructions.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if DEBUG:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": "db",
+        "PORT": env("POSTGRES_PORT"),
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": env("POSTGRES_DB"),
-            "USER": env("POSTGRES_USER"),
-            "PASSWORD": env("POSTGRES_PASSWORD"),
-            "HOST": "db",
-            "PORT": env("POSTGRES_PORT"),
-        }
-    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -189,8 +190,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
-if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
