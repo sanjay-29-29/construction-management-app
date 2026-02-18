@@ -1,6 +1,7 @@
 from django.db.models.expressions import Value, OuterRef, Subquery
 from django.db.models.fields import DecimalField
 from django.db.models.functions.comparison import Coalesce
+from django.db.models.functions.text import Lower
 from rest_framework import viewsets
 from django.db.models import Sum
 
@@ -42,7 +43,9 @@ class VendorViewSet(viewsets.ModelViewSet):
         return serializers.VendorListSerializer
 
     def get_queryset(self):
-        queryset = models.Vendor.objects.all().filter(is_deleted=False)
+        queryset = (
+            models.Vendor.objects.all().filter(is_deleted=False).order_by(Lower("name"))
+        )
 
         if (
             self.request.user.role != users_models.Roles.HEAD_OFFICE

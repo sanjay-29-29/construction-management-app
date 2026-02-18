@@ -1,3 +1,4 @@
+from django.db.models.functions import Lower
 from rest_framework.generics import ListAPIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -17,7 +18,7 @@ class SiteViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Site.objects.all().reverse().filter(is_deleted=False)
+        queryset = Site.objects.filter(is_deleted=False).order_by(Lower("name"))
 
         if self.action == "retrieve":
             queryset = queryset.prefetch_related("supervisors")

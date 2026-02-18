@@ -1,16 +1,10 @@
-from rest_framework.response import Response
-from django.db.models import Subquery
-from django.db.models import F
-from django.db.models import OuterRef
-from django.db.models import Value
+from django.db.models.functions import Lower
+from django.db.models import Subquery, F, OuterRef, Value, DecimalField, Sum
 from django.db.models.functions import Coalesce
-from django.db.models import DecimalField
-from django.db.models import Sum
 from django_filters import rest_framework as filters
 
-from rest_framework import status
-from rest_framework import viewsets
-from rest_framework import generics
+from rest_framework import status, viewsets, generics
+from rest_framework.response import Response
 
 from sites import models as sites_models
 from rate_work import models as rate_work_models
@@ -41,7 +35,7 @@ class LabourViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         site = self.kwargs.get("site_id")
-        queryset = models.Labour.objects.filter(site=site)
+        queryset = models.Labour.objects.filter(site=site).order_by(Lower("name"))
 
         if self.action == "retrieve":
             rate_work_payments_subquery = (

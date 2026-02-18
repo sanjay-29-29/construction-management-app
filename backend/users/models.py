@@ -33,9 +33,6 @@ class CustomUser(AbstractUser):
 
     objects = CustomUserManager()
 
-    class Meta:
-        ordering = ["-created_at"]
-
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 

@@ -38,7 +38,7 @@ export const RateWorkHome = () => {
     return (
         <SearchLayout
             title="Rate Workers"
-            searchPlaceholder="Search by user name"
+            searchPlaceholder="Search by labour name"
             onSearchChange={setSearchText}
             isLoading={isLoading}
             isError={isError}

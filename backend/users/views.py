@@ -1,3 +1,4 @@
+from django.db.models.functions import Lower
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
@@ -32,7 +33,9 @@ class ObtainBaseInfo(APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = get_user_model().objects.filter(is_active=True)
+    queryset = (
+        get_user_model().objects.filter(is_active=True).order_by(Lower("first_name"))
+    )
 
     def get_serializer_class(self):
         if self.action == "list" or self.action == "retrieve":
