@@ -23,19 +23,21 @@ export type ProfileCardProps = {
   showChevron?: boolean;
   className?: string;
   disableProfileIcon?: boolean;
+  secondaryDescription?: ReactNode;
   profileIcon?: ReactNode;
 };
 
 export const ProfileCard = ({
   title,
   description,
+  secondaryDescription,
   imageSrc,
   badgeText,
   badgeClassName,
-  showChevron = true,
-  disableProfileIcon = false,
   profileIcon,
   className,
+  showChevron = true,
+  disableProfileIcon = false,
 }: ProfileCardProps) => {
   return (
     <Item
@@ -63,12 +65,15 @@ export const ProfileCard = ({
       {/* Content */}
       <ItemContent>
         <ItemHeader className="line-clamp-1">{title}</ItemHeader>
-        {description && (
-          <ItemDescription className="line-clamp-1">
-            {description}
-          </ItemDescription>
-        )}
+        <ItemDescription className="line-clamp-1">
+          {description && (
+            description
+          )}
+        </ItemDescription>
       </ItemContent>
+      {secondaryDescription && (
+        secondaryDescription
+      )}
 
       {/* Actions */}
       <ItemActions>

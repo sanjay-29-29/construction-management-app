@@ -29,6 +29,8 @@ class VendorPaymentListSerializer(serializers.ModelSerializer):
 
 
 class VendorListSerializer(serializers.ModelSerializer):
+    amount_paid = serializers.FloatField(read_only=True, required=False)
+    order_cost = serializers.FloatField(read_only=True, required=False)
 
     class Meta:
         model = Vendor
@@ -41,6 +43,8 @@ class VendorListSerializer(serializers.ModelSerializer):
             "bank_account_number",
             "ifsc_code",
             "created_at",
+            "amount_paid",
+            "order_cost",
         ]
         read_only_fields = (
             "id",

@@ -53,42 +53,41 @@ class VendorViewSet(viewsets.ModelViewSet):
         ):
             return None
 
-        if self.action == "retrieve":
-            order_cost = (
-                orders_models.Order.objects.filter(vendor=OuterRef("pk"))
-                .values("vendor")
-                .annotate(total=Sum("cost"))
-                .values("total")
-            )
+        order_cost = (
+            orders_models.Order.objects.filter(vendor=OuterRef("pk"))
+            .values("vendor")
+            .annotate(total=Sum("cost"))
+            .values("total")
+        )
 
-            payment_sum = (
-                models.VendorPayment.objects.filter(vendor=OuterRef("pk"))
-                .values("vendor")
-                .annotate(total=Sum("amount"))
-                .values("total")
-            )
-            queryset = queryset.annotate(
-                order_cost=Coalesce(
-                    Subquery(
-                        order_cost,
-                        output_field=DecimalField(max_digits=12, decimal_places=2),
-                    ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
+        payment_sum = (
+            models.VendorPayment.objects.filter(vendor=OuterRef("pk"))
+            .values("vendor")
+            .annotate(total=Sum("amount"))
+            .values("total")
+        )
+        queryset = queryset.annotate(
+            order_cost=Coalesce(
+                Subquery(
+                    order_cost,
                     output_field=DecimalField(max_digits=12, decimal_places=2),
                 ),
-                amount_paid=Coalesce(
-                    Subquery(
-                        payment_sum,
-                        output_field=DecimalField(max_digits=12, decimal_places=2),
-                    ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
+                Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
+                output_field=DecimalField(max_digits=12, decimal_places=2),
+            ),
+            amount_paid=Coalesce(
+                Subquery(
+                    payment_sum,
                     output_field=DecimalField(max_digits=12, decimal_places=2),
                 ),
-            ).prefetch_related("payments")
+                Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
+                output_field=DecimalField(max_digits=12, decimal_places=2),
+            ),
+        )
+
+        if self.action == "retrieve":
+            queryset = queryset.prefetch_related("payments")
+
         return queryset
 
     def perform_destroy(self, instance):
