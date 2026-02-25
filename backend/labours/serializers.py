@@ -71,6 +71,8 @@ class LabourDocumentRetrieveSerializer(serializers.ModelSerializer):
 class LabourListSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source="get_type_display", read_only=True)
     gender = serializers.CharField(source="get_gender_display", read_only=True)
+    amount_paid = serializers.FloatField(read_only=True)
+    rate_work_payment_total = serializers.FloatField(read_only=True)
 
     class Meta:
         model = models.Labour
@@ -80,6 +82,8 @@ class LabourListSerializer(serializers.ModelSerializer):
             "type",
             "gender",
             "photo",
+            "amount_paid",
+            "rate_work_payment_total",
         ]
 
 

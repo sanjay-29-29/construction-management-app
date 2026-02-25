@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { isAxiosError } from 'axios';
-import { Edit, EllipsisVerticalIcon, X } from 'lucide-react';
-import { useMemo } from 'react';
+import { Edit, EllipsisVerticalIcon, Printer, Trash2, X } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 
@@ -15,10 +15,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { PAYMENT_TYPE } from '@/constants';
 import { useAuth } from '@/context/Auth';
-import { formatDate, formatNumber } from '@/lib/utils';
+import { cn, formatDate, formatNumber } from '@/lib/utils';
 import type { AttendanceEntry, Labour, Week } from '@/types';
 
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
+import { Button } from '@/components/ui/button';
+import { DeleteDialog } from '@/components/DeleteDialog';
 
 type AttendanceGridRow = Labour & {
   [key: string]: AttendanceEntry | string | number | null | undefined;
@@ -29,6 +31,16 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
   const { siteId, weekId } = useParams();
   const queryClient = useQueryClient();
   const { isHeadOffice } = useAuth();
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const handlePrint = useCallback(() => {
+    setIsPrinting(true);
+    setTimeout(() => {
+      window.print();
+      setIsPrinting(false);
+    }, 100);
+  }, []);
 
   const dayUpdateMutation = useMutation({
     mutationFn: async ({
@@ -77,6 +89,27 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
       toast.error('Unknown error occurred.');
     },
   });
+
+  const weekDeleteMutation = useMutation({
+    mutationFn: async () => {
+      await client.delete(`sites/${siteId}/weeks/${weekId}/`);
+    },
+    onSuccess: () => {
+      toast.success(`The week has been deleted.`);
+      navigate(`/sites/${siteId}/weeks`, { replace: true });
+      queryClient.invalidateQueries({
+        queryKey: ['sites', siteId, 'weeks', weekId],
+      });
+    },
+    onError: (error) => {
+      if (isAxiosError(error)) {
+        toast.error('An error occurred while deleting week.');
+        return;
+      }
+      toast.error('Unknown error occurred.');
+    },
+  });
+
 
   const rowData = useMemo(() => {
     if (!data?.labours || !data?.dailyEntry) return [];
@@ -275,12 +308,12 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
                 <div className="flex w-full h-full">
                   {val.advanceTaken > 0 ? (
                     <div className="flex-1 flex flex-col justify-center items-center border-r border-slate-200 font-semibold bg-amber-50 text-amber-400">
-                      <span className="text-xs font-semibold text-amber-700">
+                      <span className="text-xs font-semibold text-amber-700 print:text-sm">
                         {`₹ ${formatNumber(val.advanceTaken)} ${(val.multiplier ?? 0) !== 1 ? `${formatNumber(val.multiplier)}x` : ''} (${val.paymentType === PAYMENT_TYPE.CASH ? 'C' : 'B'})`}
                       </span>
                     </div>
                   ) : (
-                    <div className="flex-1 flex flex-col justify-center items-center border-r border-slate-200 font-semibold bg-green-50 text-emerald-500 text-xs">
+                    <div className="flex-1 flex flex-col justify-center items-center border-r border-slate-200 font-semibold bg-green-50 text-emerald-500 text-xs print:text-sm">
                       {`Present ${(val.multiplier ?? 0) !== 1 ? `${formatNumber(val.multiplier)}x` : ''} `}
                     </div>
                   )}
@@ -292,11 +325,11 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
             return (
               <div className="w-full h-full flex items-center justify-center gap-1.5 opacity-60 bg-red-100">
                 {val.advanceTaken > 0 ? (
-                  <div className="text-xs font-semibold text-red-600">
+                  <div className="text-xs font-semibold text-red-600 print:text-sm">
                     {`₹ ${formatNumber(val.advanceTaken)} (${val.paymentType === PAYMENT_TYPE.CASH ? 'C' : 'B'})`}
                   </div>
                 ) : (
-                  <span className="text-red-600 text-xs font-semibold">
+                  <span className="text-red-600 text-xs font-semibold print:text-sm">
                     Absent
                   </span>
                 )}
@@ -435,10 +468,30 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
       <div className="text-2xl font-bold hidden lg:block">
         Week of <span>{formatDate(data?.startDate)}</span>
       </div>
-      <div className="text-xl font-semibold text-gray-900">
-        This Week's Attendance
+      <div className="flex items-center justify-between">
+        <div className="text-xl font-semibold text-gray-900">
+          This Week's Attendance
+        </div>
+        <div className='grid gap-2 grid-cols-2'>
+          <Button onClick={handlePrint}
+            variant='outline'
+          >
+            <Printer size={16} />
+          </Button>
+          {
+            isHeadOffice &&
+            <Button
+              variant='outline'
+              className="h-9 w-9 shrink-0 border-red-300 hover:bg-red-100 text-red-600 hover:text-red-600"
+              onClick={(() => setDeleteDialogOpen(true))}
+            >
+              <Trash2 size={16} />
+            </Button>
+
+          }
+        </div>
       </div>
-      <div className="h-120 sm:h-200 overflow-auto create-order ag-theme-alpine cell-border">
+      <div className={cn("h-120 sm:h-200 overflow-auto create-order ag-theme-alpine cell-border", isPrinting ? "w-500 h-full" : "")}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
@@ -453,6 +506,12 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
           }}
         />
       </div>
+      <DeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onDelete={weekDeleteMutation.mutate}
+        description="Are you sure you want to delete this week? This action cannot be undone"
+        loading={weekDeleteMutation.isPending} />
     </div>
   );
 };

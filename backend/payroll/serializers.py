@@ -1,5 +1,13 @@
 from django.db.models.functions.comparison import Coalesce
-from django.db.models import Sum, OuterRef, Subquery, DecimalField, Value, F, ExpressionWrapper
+from django.db.models import (
+    Sum,
+    OuterRef,
+    Subquery,
+    DecimalField,
+    Value,
+    F,
+    ExpressionWrapper,
+)
 from django.db import transaction
 
 from rest_framework import serializers
@@ -189,12 +197,11 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
                 # 2. Calculate actual pay for that day: Base Wage * Multiplier
                 # We use ExpressionWrapper to ensure the Float(multiplier) * Decimal(wage) returns a Decimal
                 day_pay=ExpressionWrapper(
-                    F("base_wage") * F("multiplier"),
-                    output_field=DecimalField()
+                    F("base_wage") * F("multiplier"), output_field=DecimalField()
                 )
             )
             .values("labour")
-            .annotate(total=Sum("day_pay")) # 3. Sum the calculated daily pays
+            .annotate(total=Sum("day_pay"))  # 3. Sum the calculated daily pays
             .values("total")
         )
 
@@ -229,7 +236,7 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
         # -------------------------------------------------------
         # SUBQUERY 5: CURRENT WEEK ACTIVITY
         # -------------------------------------------------------
-        
+
         # A. Current Advances (Unchanged)
         current_advance_subquery = (
             models.LabourAttendance.objects.filter(
@@ -283,11 +290,14 @@ class WeekRetrieveSerializer(serializers.ModelSerializer):
                 # Logic: (Sum of Multipliers for this week) * (This Week's Daily Wage)
                 curr_earned=ExpressionWrapper(
                     Coalesce(
-                        Subquery(current_billable_units_subquery, output_field=DecimalField()),
+                        Subquery(
+                            current_billable_units_subquery, output_field=DecimalField()
+                        ),
                         Value(0, output_field=DecimalField()),
-                    ) * F("weekly_daily_wage"),
-                    output_field=DecimalField()
-                )
+                    )
+                    * F("weekly_daily_wage"),
+                    output_field=DecimalField(),
+                ),
             )
             .annotate(
                 # 3. Opening Balance
@@ -378,7 +388,7 @@ class DailyEntryUpdateSerializer(serializers.ModelSerializer):
                             labour_id=item["labour"],
                             is_present=item["is_present"],
                             advance_taken=item["advance_taken"],
-                            multiplier = item["multiplier"],
+                            multiplier=item["multiplier"],
                         )
                         for item in attendance_data
                     ]

@@ -2,7 +2,6 @@ from django.urls.conf import path
 
 from . import views as views
 
-
 weekly_labour_list = views.WeekLabourAssignmentViewSet.as_view(
     {
         "get": "list",

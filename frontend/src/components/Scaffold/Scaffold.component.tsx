@@ -120,7 +120,7 @@ export const Scaffold = ({ children, title, disablePadding }: ScaffoldType) => {
       {/* Page Content */}
       <main
         className={cn(
-          'mx-auto w-full max-w-7xl flex-1 flex flex-col',
+          'mx-auto w-full max-w-7xl flex-1 flex flex-col print:max-w-none print:p-0',
           disablePadding ? null : 'p-4 sm:p-6 lg:p-8'
         )}
       >

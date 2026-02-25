@@ -2,7 +2,6 @@ from django.urls.conf import path
 
 from . import views as views
 
-
 urlpatterns = [
     path(
         "labours/<uuid:labour_id>/rate-work/",

@@ -15,7 +15,6 @@ from . import models as models
 
 
 class LabourViewSet(viewsets.ModelViewSet):
-    serializer_class = serializers.LabourSerializer
     filter_backends = [
         filters.DjangoFilterBackend,
     ]
@@ -35,23 +34,18 @@ class LabourViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         site = self.kwargs.get("site_id")
-        queryset = models.Labour.objects.filter(site=site).order_by(Lower("name"))
-
-        if self.action == "retrieve":
-            rate_work_payments_subquery = (
-                rate_work_models.RateWork.objects.filter(
-                    labour=OuterRef("id"),
-                )
-                .values("labour")
-                .annotate(total=Sum(F("cost_per_unit") * F("quantity")))
-                .values("total")
+        rate_work_payments_subquery = (
+            rate_work_models.RateWork.objects.filter(
+                labour=OuterRef("id"),
             )
-
-            queryset = queryset.prefetch_related(
-                "documents",
-                "rate_work_payments",
-                "rate_works",
-            ).annotate(
+            .values("labour")
+            .annotate(total=Sum(F("cost_per_unit") * F("quantity")))
+            .values("total")
+        )
+        queryset = (
+            models.Labour.objects.filter(site=site)
+            .order_by(Lower("name"))
+            .annotate(
                 amount_paid=Coalesce(
                     Sum("rate_work_payments__amount"),
                     Value(
@@ -61,6 +55,14 @@ class LabourViewSet(viewsets.ModelViewSet):
                 rate_work_payment_total=Subquery(
                     rate_work_payments_subquery, output_field=DecimalField()
                 ),
+            )
+        )
+
+        if self.action == "retrieve":
+            queryset = queryset.prefetch_related(
+                "documents",
+                "rate_work_payments",
+                "rate_works",
             )
 
         return queryset

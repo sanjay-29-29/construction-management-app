@@ -118,6 +118,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -145,4 +146,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* ── Print Styles ── */
+@page {
+  size: landscape;
+  margin: 5mm;
+}
+
+@media print {
+  .ag-theme-alpine {
+    transform: scale(0.7) !important;
+    transform-origin: top left !important;
+    width: 200% !important;
+  }
 }

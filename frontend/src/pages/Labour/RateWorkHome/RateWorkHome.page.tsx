@@ -6,6 +6,7 @@ import { client } from '@/axios';
 import { ProfileCard } from '@/components/ProfileCard';
 import { SearchLayout } from '@/layouts/Search';
 import type { Labour } from '@/types';
+import { formatNumber } from '@/lib/utils';
 
 export const RateWorkHome = () => {
     const { siteId } = useParams();
@@ -53,6 +54,20 @@ export const RateWorkHome = () => {
                         title={labour.name}
                         description={labour.type}
                         imageSrc={labour.photo}
+                        secondaryDescription={
+                            <>
+                                {(labour.rateWorkPaymentTotal ?? 0) - (labour.amountPaid ?? 0) > 0 && (
+                                    <div className='text-xs text-red-500 font-semibold'>
+                                        - ₹{formatNumber((labour.rateWorkPaymentTotal ?? 0) - (labour.amountPaid ?? 0))}
+                                    </div>
+                                )}
+                                {(labour.rateWorkPaymentTotal ?? 0) - (labour.amountPaid ?? 0) < 0 && (
+                                    <div className='text-xs text-green-500 font-semibold'>
+                                        + ₹{formatNumber((labour.amountPaid ?? 0) - (labour.rateWorkPaymentTotal ?? 0))}
+                                    </div>
+                                )}
+                            </>
+                        }
                     />
                 </Link>
             )}
