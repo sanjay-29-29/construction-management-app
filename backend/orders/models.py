@@ -10,8 +10,7 @@ from vendors.models import Vendor
 
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    number = models.CharField(max_length=150)
+    no = models.PositiveIntegerField(unique=True, editable=False, null=True)
     name = models.CharField(max_length=150)
 
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="orders")
@@ -34,12 +33,19 @@ class Order(models.Model):
         ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
+        if self.no is None:
+            last = Order.objects.order_by("-no").values_list("no", flat=True).first()
+            self.no = (last or 0) + 1
         if self.is_completed and self.completed_at is None:
             self.completed_at = timezone.now()
         elif not self.is_completed:
             self.completed_at = None
             self.completed_by = None
         super().save(*args, **kwargs)
+
+    @property
+    def number(self):
+        return f"KS{self.no:02d}"
 
     def __str__(self):
         return f"{self.name} | {self.site}"

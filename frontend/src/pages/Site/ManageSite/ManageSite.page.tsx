@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { ClipboardCheck, HardHatIcon, Loader2, Users2 } from 'lucide-react';
+import {
+  Book,
+  ClipboardCheck,
+  HardHatIcon,
+  Loader2,
+  Users2,
+} from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -117,7 +123,17 @@ export const ManageSite = () => {
               }
               className="hover:bg-white/60"
             />
-
+            <ItemCard
+              title="Day Book"
+              description="View and manage day book"
+              to="daybook"
+              icon={
+                <div className="bg-blue-100 p-2 rounded-lg">
+                  <Book className="h-6 w-6 text-blue-600" />
+                </div>
+              }
+              className="hover:bg-white/60"
+            />
           </div>
         </div>
         <SiteOrderGrid site={site} />

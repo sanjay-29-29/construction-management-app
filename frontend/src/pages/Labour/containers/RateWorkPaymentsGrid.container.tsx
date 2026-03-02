@@ -61,7 +61,7 @@ export const RateWorkPayments = ({ data }: { data?: Labour }) => {
         sortable: true,
         filter: false,
         valueFormatter: (params) => `₹ ${formatNumber(params.value)}`,
-        valueGetter: (params) => parseInt(params.data?.amount ?? '')
+        valueGetter: (params) => parseInt(params.data?.amount ?? ''),
       },
       {
         headerName: 'Actions',

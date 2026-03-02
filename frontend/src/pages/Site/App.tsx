@@ -6,11 +6,17 @@ import {
   ManageDay,
   PaymentPage,
 } from '@/pages/Attendance';
-import { LabourHome, LabourCreate, ManageLabour, RateWorkHome } from '@/pages/Labour';
+import {
+  LabourHome,
+  LabourCreate,
+  ManageLabour,
+  RateWorkHome,
+} from '@/pages/Labour';
 
 import { CreateSitePage } from './CreateSite';
 import { HomePage } from './Home';
 import { ManageSite } from './ManageSite';
+import { Daybook } from './Daybook';
 
 export const App = () => {
   return (
@@ -31,6 +37,7 @@ export const App = () => {
           <Route path="rate-work" element={<RateWorkHome />} />
           <Route path=":labourId" element={<ManageLabour />} />
         </Route>
+        <Route path="daybook" element={<Daybook />} />
       </Route>
     </Routes>
   );

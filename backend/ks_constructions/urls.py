@@ -32,6 +32,7 @@ urlpatterns = [
                 path("", include("payroll.urls")),
                 path("", include("labours.urls")),
                 path("", include("rate_work.urls")),
+                path("", include("daybook.urls")),
             ]
         ),
     ),

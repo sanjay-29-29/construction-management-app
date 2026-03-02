@@ -110,7 +110,6 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
     },
   });
 
-
   const rowData = useMemo(() => {
     if (!data?.labours || !data?.dailyEntry) return [];
 
@@ -472,26 +471,27 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
         <div className="text-xl font-semibold text-gray-900">
           This Week's Attendance
         </div>
-        <div className='grid gap-2 grid-cols-2'>
-          <Button onClick={handlePrint}
-            variant='outline'
-          >
+        <div className="grid gap-2 grid-cols-2">
+          <Button onClick={handlePrint} variant="outline">
             <Printer size={16} />
           </Button>
-          {
-            isHeadOffice &&
+          {isHeadOffice && (
             <Button
-              variant='outline'
+              variant="outline"
               className="h-9 w-9 shrink-0 border-red-300 hover:bg-red-100 text-red-600 hover:text-red-600"
-              onClick={(() => setDeleteDialogOpen(true))}
+              onClick={() => setDeleteDialogOpen(true)}
             >
               <Trash2 size={16} />
             </Button>
-
-          }
+          )}
         </div>
       </div>
-      <div className={cn("h-120 sm:h-200 overflow-auto create-order ag-theme-alpine cell-border", isPrinting ? "w-500 h-full" : "")}>
+      <div
+        className={cn(
+          'h-120 sm:h-200 overflow-auto create-order ag-theme-alpine cell-border',
+          isPrinting ? 'w-500 h-full' : ''
+        )}
+      >
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
@@ -511,7 +511,8 @@ export const AttendanceGrid = ({ data }: { data?: Week }) => {
         onOpenChange={setDeleteDialogOpen}
         onDelete={weekDeleteMutation.mutate}
         description="Are you sure you want to delete this week? This action cannot be undone"
-        loading={weekDeleteMutation.isPending} />
+        loading={weekDeleteMutation.isPending}
+      />
     </div>
   );
 };

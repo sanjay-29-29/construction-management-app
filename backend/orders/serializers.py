@@ -88,7 +88,6 @@ class OrderSerializer(serializers.ModelSerializer):
             "site",
             "vendor",
             "materials",
-            "number",
             "remarks",
             "is_completed",
         ]

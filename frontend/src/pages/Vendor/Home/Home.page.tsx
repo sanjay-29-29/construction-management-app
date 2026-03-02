@@ -43,20 +43,30 @@ export const HomePage = () => {
       bottomLinkTo="create"
       renderItem={(vendor) => (
         <Link to={vendor.id.toString()}>
-          <ProfileCard title={vendor.name} description={vendor.address} secondaryDescription={
-            <>
-              {(vendor.orderCost ?? 0) - (vendor.amountPaid ?? 0) > 0 && (
-                <div className='text-xs text-red-500 font-semibold'>
-                  - ₹{formatNumber((vendor.orderCost ?? 0) - (vendor.amountPaid ?? 0))}
-                </div>
-              )}
-              {(vendor.orderCost ?? 0) - (vendor.amountPaid ?? 0) < 0 && (
-                <div className='text-xs text-green-500 font-semibold'>
-                  + ₹{formatNumber((vendor.amountPaid ?? 0) - (vendor.orderCost ?? 0))}
-                </div>
-              )}
-            </>
-          } />
+          <ProfileCard
+            title={vendor.name}
+            description={vendor.address}
+            secondaryDescription={
+              <>
+                {(vendor.orderCost ?? 0) - (vendor.amountPaid ?? 0) > 0 && (
+                  <div className="text-xs text-red-500 font-semibold">
+                    - ₹
+                    {formatNumber(
+                      (vendor.orderCost ?? 0) - (vendor.amountPaid ?? 0)
+                    )}
+                  </div>
+                )}
+                {(vendor.orderCost ?? 0) - (vendor.amountPaid ?? 0) < 0 && (
+                  <div className="text-xs text-green-500 font-semibold">
+                    + ₹
+                    {formatNumber(
+                      (vendor.amountPaid ?? 0) - (vendor.orderCost ?? 0)
+                    )}
+                  </div>
+                )}
+              </>
+            }
+          />
         </Link>
       )}
     />

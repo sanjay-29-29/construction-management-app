@@ -66,14 +66,10 @@ export const ProfileCard = ({
       <ItemContent>
         <ItemHeader className="line-clamp-1">{title}</ItemHeader>
         <ItemDescription className="line-clamp-1">
-          {description && (
-            description
-          )}
+          {description && description}
         </ItemDescription>
       </ItemContent>
-      {secondaryDescription && (
-        secondaryDescription
-      )}
+      {secondaryDescription && secondaryDescription}
 
       {/* Actions */}
       <ItemActions>

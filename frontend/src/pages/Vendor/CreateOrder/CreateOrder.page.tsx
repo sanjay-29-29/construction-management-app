@@ -50,7 +50,6 @@ const materialSchema = z.object({
 
 const createOrderSchema = z.object({
   name: z.string().min(1, { error: 'Please enter a valid order name.' }),
-  number: z.string().min(1, { error: 'Please enter a valid order number.' }),
   site: z.string().min(1, { error: 'Please select a valid site.' }),
   materials: z
     .array(materialSchema)
@@ -92,7 +91,6 @@ export const CreateOrderPage = () => {
     defaultValues: {
       name: '',
       site: '',
-      number: '',
       materials: [],
     },
   });
@@ -360,26 +358,6 @@ export const CreateOrderPage = () => {
                     />
                   </FormControl>
                   <FormDescription>Enter order name</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Order Number</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="KS101"
-                      type="text"
-                      autoComplete="off"
-                      disabled={mutation.isPending}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>Enter order number</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

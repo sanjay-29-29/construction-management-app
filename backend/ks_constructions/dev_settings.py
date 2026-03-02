@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     "payroll",
     "rate_work",
     "labours",
+    "daybook",
 ]
 
 

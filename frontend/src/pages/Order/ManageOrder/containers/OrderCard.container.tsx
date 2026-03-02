@@ -65,7 +65,6 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
 
   const updateOrderSchema = z.object({
     name: z.string().min(1, { error: 'Please enter a valid name' }),
-    number: z.string().min(1, { error: 'Please enter a order number' }),
     isCompleted: z.boolean(),
   });
 
@@ -75,7 +74,6 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
     resolver: zodResolver(updateOrderSchema),
     defaultValues: {
       name: '',
-      number: '',
       isCompleted: false,
     },
   });
@@ -151,11 +149,10 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
               </CardTitle>
 
               <Badge
-                className={`shrink-0 ${
-                  order?.isCompleted
-                    ? 'bg-green-100 text-green-600'
-                    : 'bg-blue-100 text-blue-600'
-                }`}
+                className={`shrink-0 ${order?.isCompleted
+                  ? 'bg-green-100 text-green-600'
+                  : 'bg-blue-100 text-blue-600'
+                  }`}
               >
                 {order?.isCompleted ? 'Completed' : 'Pending'}
               </Badge>
@@ -309,26 +306,6 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
                             />
                           </FormControl>
                           <FormDescription>Enter order name</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name="number"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Order Number</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              id={field.name}
-                              placeholder="KS101"
-                              autoComplete="off"
-                              disabled={updateOrderMutation.isPending}
-                            />
-                          </FormControl>
-                          <FormDescription>Enter order number</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}

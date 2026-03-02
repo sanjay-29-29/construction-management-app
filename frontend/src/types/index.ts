@@ -10,3 +10,4 @@ export type {
   DailyEntry,
 } from './attendance.type';
 export type { RateWork, RateWorkPayment } from './ratework.type.ts';
+export type { Head, Entry } from './daybook.type';
