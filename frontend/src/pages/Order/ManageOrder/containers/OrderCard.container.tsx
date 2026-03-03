@@ -149,10 +149,11 @@ export const OrderCardContainer = ({ order }: OrderCardContainerType) => {
               </CardTitle>
 
               <Badge
-                className={`shrink-0 ${order?.isCompleted
-                  ? 'bg-green-100 text-green-600'
-                  : 'bg-blue-100 text-blue-600'
-                  }`}
+                className={`shrink-0 ${
+                  order?.isCompleted
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-blue-100 text-blue-600'
+                }`}
               >
                 {order?.isCompleted ? 'Completed' : 'Pending'}
               </Badge>

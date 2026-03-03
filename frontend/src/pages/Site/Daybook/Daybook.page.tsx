@@ -2,7 +2,14 @@ import { AgGridReact } from 'ag-grid-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { Check, ChevronsUpDown, Loader2, Plus, Printer, Trash2 } from 'lucide-react';
+import {
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  Plus,
+  Printer,
+  Trash2,
+} from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useParams } from 'react-router';
@@ -186,8 +193,8 @@ export const Daybook = () => {
   const totals = useMemo(() => {
     return rowData.reduce(
       (acc, entry) => ({
-        credit: acc.credit + parseFloat(entry.amountCr || '0'),
-        debit: acc.debit + parseFloat(entry.amountDb || '0'),
+        credit: acc.credit + (Number(entry.amountCr) || 0),
+        debit: acc.debit + (Number(entry.amountDb) || 0),
       }),
       { credit: 0, debit: 0 }
     );
@@ -199,8 +206,8 @@ export const Daybook = () => {
       {
         headName: 'Total',
         description: '',
-        amountCr: formatNumber(totals.credit),
-        amountDb: formatNumber(totals.debit),
+        amountCr: String(totals.credit),
+        amountDb: String(totals.debit),
         createdBy: `₹${formatNumber(totals.credit - totals.debit)}`,
       },
     ],
@@ -208,11 +215,15 @@ export const Daybook = () => {
   );
 
   const editableHeads = useMemo(
-    () => heads?.filter((head) => siteId === head.site && !head.isDeleted) ?? [],
+    () =>
+      heads?.filter((head) => siteId === head.site && !head.isDeleted) ?? [],
     [heads]
   );
 
-  const usableHeads = useMemo(() => heads?.filter((head) => !head.isDeleted), [heads]);
+  const usableHeads = useMemo(
+    () => heads?.filter((head) => !head.isDeleted),
+    [heads]
+  );
 
   // AG Grid column definitions
   const columnDefs: ColDef<EntryRow>[] = useMemo(
@@ -257,11 +268,10 @@ export const Daybook = () => {
         field: 'amountCr',
         sortable: true,
         filter: 'agNumberColumnFilter',
+        comparator: (valueA, valueB) => (Number(valueA) || 0) - (Number(valueB) || 0),
         valueFormatter: ({ value }) => {
           const num = parseFloat(value);
-          return num > 0
-            ? `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
-            : '—';
+          return num > 0 ? `₹${formatNumber(num)}` : '—';
         },
         cellClass: 'text-green-600 font-semibold text-right',
       },
@@ -270,11 +280,10 @@ export const Daybook = () => {
         field: 'amountDb',
         sortable: true,
         filter: 'agNumberColumnFilter',
+        comparator: (valueA, valueB) => (Number(valueA) || 0) - (Number(valueB) || 0),
         valueFormatter: ({ value }) => {
           const num = parseFloat(value);
-          return num > 0
-            ? `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
-            : '—';
+          return num > 0 ? `₹${formatNumber(num)}` : '—';
         },
         cellClass: 'text-red-600 font-semibold text-right',
       },
@@ -408,12 +417,8 @@ export const Daybook = () => {
             </Popover>
 
             {/* Actions */}
-            <div className='flex flex-row gap-2'>
-              <Button
-                size="sm"
-                onClick={handlePrint}
-                variant="outline"
-              >
+            <div className="flex flex-row gap-2">
+              <Button size="sm" onClick={handlePrint} variant="outline">
                 <Printer className="h-4 w-4" />
               </Button>
               <Button
@@ -424,7 +429,6 @@ export const Daybook = () => {
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Add Entry</span>
               </Button>
-
             </div>
           </div>
 
@@ -433,19 +437,13 @@ export const Daybook = () => {
             <div className="rounded-xl border bg-white p-4">
               <p className="text-xs text-gray-500 font-medium">Total Credit</p>
               <p className="text-xl font-bold text-green-600 mt-1">
-                ₹
-                {totals.credit.toLocaleString('en-IN', {
-                  minimumFractionDigits: 2,
-                })}
+                ₹{formatNumber(totals.credit)}
               </p>
             </div>
             <div className="rounded-xl border bg-white p-4">
               <p className="text-xs text-gray-500 font-medium">Total Debit</p>
               <p className="text-xl font-bold text-red-600 mt-1">
-                ₹
-                {totals.debit.toLocaleString('en-IN', {
-                  minimumFractionDigits: 2,
-                })}
+                ₹{formatNumber(totals.debit)}
               </p>
             </div>
             <div className="rounded-xl border bg-white p-4 col-span-2 sm:col-span-1">
@@ -456,17 +454,14 @@ export const Daybook = () => {
                   : 'text-red-600'
                   }`}
               >
-                ₹
-                {(totals.credit - totals.debit).toLocaleString('en-IN', {
-                  minimumFractionDigits: 2,
-                })}
+                ₹{formatNumber(totals.credit - totals.debit)}
               </p>
             </div>
           </div>
 
           {/* AG Grid entries table */}
-          <div className="rounded-xl border bg-white overflow-hidden">
-            <div className="w-full h-[500px]">
+          <div className="rounded-xl border bg-white overflow-hidden print:overflow-visible print:border-none print:flex-none">
+            <div className="w-full h-[500px] print:h-auto print:block">
               <AgGridReact<EntryRow>
                 ref={gridRef}
                 rowData={rowData}
