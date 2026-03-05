@@ -461,7 +461,7 @@ export const Daybook = () => {
 
           {/* AG Grid entries table */}
           <div className="rounded-xl border bg-white overflow-hidden print:overflow-visible print:border-none print:flex-none">
-            <div className="w-full h-[500px] print:h-auto print:block">
+            <div className="w-full h-[500px] print:h-auto print:block" style={{ '--ag-column-border': '1px solid #e5e7eb' } as React.CSSProperties}>
               <AgGridReact<EntryRow>
                 ref={gridRef}
                 rowData={rowData}
