@@ -11,6 +11,8 @@ export type Entry = {
   id: string;
   head: string;
   description: string;
+  reference: string;
+  paymentType: string;
   createdAt: string;
   createdBy: string;
   amountDb: string;

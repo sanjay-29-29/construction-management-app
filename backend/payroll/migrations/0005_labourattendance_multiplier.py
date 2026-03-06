@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payroll', '0004_labourpayment_payment_type_and_more'),
+        ("payroll", "0004_labourpayment_payment_type_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='labourattendance',
-            name='multiplier',
+            model_name="labourattendance",
+            name="multiplier",
             field=models.FloatField(blank=True, default=1),
         ),
     ]

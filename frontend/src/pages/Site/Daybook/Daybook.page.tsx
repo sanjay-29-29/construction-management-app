@@ -57,6 +57,14 @@ import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 
 import { ManageHeadsTab } from './ManageHeadsDialog';
 import { formatDate, formatNumber } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { PAYMENT_DROPDOWN } from '@/constants';
 
 const createEntrySchema = z.object({
   head: z.string().min(1, 'Please select a head'),
@@ -67,6 +75,8 @@ const createEntrySchema = z.object({
   amountDb: z.coerce
     .number<number>()
     .nonnegative('Please enter a positive number'),
+  reference: z.string(),
+  paymentType: z.number('Please select a payment type'),
 });
 
 type CreateEntryFormValues = z.infer<typeof createEntrySchema>;
@@ -97,6 +107,8 @@ export const Daybook = () => {
     defaultValues: {
       head: '',
       description: '',
+      reference: '',
+      paymentType: 1,
       amountCr: 0,
       amountDb: 0,
     },
@@ -121,12 +133,7 @@ export const Daybook = () => {
   // Create entry mutation
   const createEntryMutation = useMutation({
     mutationFn: async (data: CreateEntryFormValues) => {
-      await client.post(`sites/${siteId}/entries/`, {
-        head: data.head,
-        description: data.description,
-        amountCr: data.amountCr,
-        amountDb: data.amountDb,
-      });
+      await client.post(`sites/${siteId}/entries/`, data);
     },
     onSuccess: () => {
       toast.success('Entry created successfully');
@@ -264,11 +271,32 @@ export const Daybook = () => {
         flex: 2,
       },
       {
+        headerName: 'Reference',
+        field: 'reference',
+        sortable: true,
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          maxNumConditions: 1,
+          filterOptions: ['contains'],
+        },
+      },
+      {
+        headerName: 'Payment Type',
+        field: 'paymentType',
+        sortable: true,
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          maxNumConditions: 1,
+          filterOptions: ['contains'],
+        },
+      },
+      {
         headerName: 'Credit (₹)',
         field: 'amountCr',
         sortable: true,
         filter: 'agNumberColumnFilter',
-        comparator: (valueA, valueB) => (Number(valueA) || 0) - (Number(valueB) || 0),
+        comparator: (valueA, valueB) =>
+          (Number(valueA) || 0) - (Number(valueB) || 0),
         valueFormatter: ({ value }) => {
           const num = parseFloat(value);
           return num > 0 ? `₹${formatNumber(num)}` : '—';
@@ -280,7 +308,8 @@ export const Daybook = () => {
         field: 'amountDb',
         sortable: true,
         filter: 'agNumberColumnFilter',
-        comparator: (valueA, valueB) => (Number(valueA) || 0) - (Number(valueB) || 0),
+        comparator: (valueA, valueB) =>
+          (Number(valueA) || 0) - (Number(valueB) || 0),
         valueFormatter: ({ value }) => {
           const num = parseFloat(value);
           return num > 0 ? `₹${formatNumber(num)}` : '—';
@@ -303,7 +332,7 @@ export const Daybook = () => {
         sortable: false,
         filter: false,
         resizable: false,
-        maxWidth: 90,
+        maxWidth: 80,
         cellRenderer: (params: ICellRendererParams<EntryRow>) => (
           <div className="flex items-center justify-center h-full">
             {!params.node.rowPinned && (
@@ -449,10 +478,11 @@ export const Daybook = () => {
             <div className="rounded-xl border bg-white p-4 col-span-2 sm:col-span-1">
               <p className="text-xs text-gray-500 font-medium">Balance</p>
               <p
-                className={`text-xl font-bold mt-1 ${totals.credit - totals.debit >= 0
-                  ? 'text-green-600'
-                  : 'text-red-600'
-                  }`}
+                className={`text-xl font-bold mt-1 ${
+                  totals.credit - totals.debit >= 0
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                }`}
               >
                 ₹{formatNumber(totals.credit - totals.debit)}
               </p>
@@ -461,7 +491,14 @@ export const Daybook = () => {
 
           {/* AG Grid entries table */}
           <div className="rounded-xl border bg-white overflow-hidden print:overflow-visible print:border-none print:flex-none">
-            <div className="w-full h-[500px] print:h-auto print:block" style={{ '--ag-column-border': '1px solid #e5e7eb' } as React.CSSProperties}>
+            <div
+              className="w-full h-[500px] print:h-auto print:block"
+              style={
+                {
+                  '--ag-column-border': '1px solid #e5e7eb',
+                } as React.CSSProperties
+              }
+            >
               <AgGridReact<EntryRow>
                 ref={gridRef}
                 rowData={rowData}
@@ -514,6 +551,7 @@ export const Daybook = () => {
                             variant="outline"
                             role="combobox"
                             className="w-full justify-between font-normal"
+                            disabled={createEntryMutation.isPending}
                           >
                             {field.value
                               ? headMap.get(field.value) || 'Select a head'
@@ -555,6 +593,7 @@ export const Daybook = () => {
               <FormField
                 control={form.control}
                 name="description"
+                disabled={createEntryMutation.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Description</FormLabel>
@@ -565,10 +604,54 @@ export const Daybook = () => {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="reference"
+                disabled={createEntryMutation.isPending}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reference</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter reference" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="paymentType"
+                disabled={createEntryMutation.isPending}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Payment Type</FormLabel>
+
+                    <Select
+                      onValueChange={(val) => field.onChange(Number(val))}
+                      defaultValue={String(field.value)}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="h-9 w-full truncate">
+                          <SelectValue placeholder="Select Payment Type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {PAYMENT_DROPDOWN.map((val) => (
+                          <SelectItem value={val.value} key={val.value}>
+                            {val.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
               <div className="grid sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="amountCr"
+                  disabled={createEntryMutation.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Credit (₹)</FormLabel>
@@ -588,6 +671,7 @@ export const Daybook = () => {
                 <FormField
                   control={form.control}
                   name="amountDb"
+                  disabled={createEntryMutation.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Debit (₹)</FormLabel>
@@ -609,6 +693,7 @@ export const Daybook = () => {
                 <Button
                   type="button"
                   variant="outline"
+                  disabled={createEntryMutation.isPending}
                   onClick={() => setIsCreateDialogOpen(false)}
                 >
                   Cancel

@@ -20,6 +20,7 @@ class HeadSerializer(serializers.ModelSerializer):
 class EntryListSerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField(format="%Y-%m-%d")
+    payment_type = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Entry
@@ -29,9 +30,14 @@ class EntryListSerializer(serializers.ModelSerializer):
             "description",
             "created_at",
             "created_by",
+            "reference",
+            "payment_type",
             "amount_db",
             "amount_cr",
         ]
+
+    def get_payment_type(self, obj):
+        return obj.get_payment_type_display()
 
     def get_created_by(self, obj):
         return f"{obj.created_by.first_name} {obj.created_by.last_name}"
@@ -43,6 +49,8 @@ class EntrySerializer(serializers.ModelSerializer):
         fields = [
             "head",
             "description",
+            "reference",
+            "payment_type",
             "amount_db",
             "amount_cr",
         ]

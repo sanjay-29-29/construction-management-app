@@ -44,7 +44,7 @@ class EntryViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         site_id = self.kwargs.get("site_id")
-        queryset = models.Entry.objects.filter(site=site_id)
+        queryset = models.Entry.objects.filter(site=site_id).order_by("-created_at")
 
         return queryset
 
